@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x437a1f02769d254a759ce05ca2ca2a55ac73fb000be0e36d1a240bbfd0c75d4f",
+    "hash": "0x59c6e4e1841a625c2827060f3439e6aacb8fccc7b8f917aee32e67afeaa418ff",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -62,7 +62,7 @@
         "displayName": [
           "Balance"
         ],
-        "type": 16
+        "type": 18
       },
       "blockNumber": {
         "displayName": [
@@ -74,23 +74,29 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 18
+        "type": 20
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 17
+        "type": 19
       },
       "maxEventTopics": 4,
       "timestamp": {
         "displayName": [
           "Timestamp"
         ],
-        "type": 7
+        "type": 6
       }
     },
-    "events": [],
+    "events": [
+      {
+        "args": [],
+        "docs": [],
+        "label": "ProposaUpdated"
+      }
+    ],
     "lang_error": {
       "displayName": [
         "ink",
@@ -127,6 +133,32 @@
           "type": 13
         },
         "selector": "0xa9b6109b"
+      },
+      {
+        "args": [
+          {
+            "label": "proposal_id",
+            "type": {
+              "displayName": [
+                "u64"
+              ],
+              "type": 6
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "get_proposal_by_id",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 16
+        },
+        "selector": "0x9d880359"
       }
     ]
   },
@@ -150,7 +182,7 @@
                   "layout": {
                     "leaf": {
                       "key": "0x968a340f",
-                      "ty": 6
+                      "ty": 7
                     }
                   },
                   "root_key": "0x968a340f"
@@ -162,7 +194,7 @@
               "layout": {
                 "leaf": {
                   "key": "0x00000000",
-                  "ty": 7
+                  "ty": 6
                 }
               },
               "name": "proposal_count"
@@ -224,6 +256,11 @@
                 "name": "proposal_cid",
                 "type": 4,
                 "typeName": "Vec<u8>"
+              },
+              {
+                "name": "proposal_id",
+                "type": 6,
+                "typeName": "u64"
               }
             ]
           }
@@ -293,9 +330,7 @@
       "id": 6,
       "type": {
         "def": {
-          "sequence": {
-            "type": 7
-          }
+          "primitive": "u64"
         }
       }
     },
@@ -303,7 +338,9 @@
       "id": 7,
       "type": {
         "def": {
-          "primitive": "u64"
+          "sequence": {
+            "type": 6
+          }
         }
       }
     },
@@ -519,12 +556,62 @@
       "id": 16,
       "type": {
         "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 17
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 17
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
+          "primitive": "bool"
+        }
+      }
+    },
+    {
+      "id": 18,
+      "type": {
+        "def": {
           "primitive": "u128"
         }
       }
     },
     {
-      "id": 17,
+      "id": 19,
       "type": {
         "def": {
           "composite": {
@@ -544,7 +631,7 @@
       }
     },
     {
-      "id": 18,
+      "id": 20,
       "type": {
         "def": {
           "variant": {}

@@ -7,6 +7,9 @@ mod dao {
     use ink::storage::Mapping;
     use scale::{Decode, Encode};
 
+    #[ink(event)]
+    pub struct ProposaUpdated {}
+
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
     pub enum Error {
@@ -17,7 +20,7 @@ mod dao {
     #[derive(Encode, Decode)]
     #[cfg_attr(
         feature = "std",
-        derive(Debug, PartialEq, Eq, scale_info::TypeInfo, StorageLayout,)
+        derive(Debug, Clone, PartialEq, Eq, scale_info::TypeInfo, StorageLayout,)
     )]
     pub enum ProposalStatus {
         Pending,
@@ -40,13 +43,14 @@ mod dao {
     #[derive(Encode, Decode)]
     #[cfg_attr(
         feature = "std",
-        derive(Debug, PartialEq, Eq, scale_info::TypeInfo, StorageLayout,)
+        derive(Debug, Clone, PartialEq, Eq, scale_info::TypeInfo, StorageLayout,)
     )]
     pub struct Proposal {
         status: ProposalStatus,
         start_block: u32,
         duration: u32,
         proposal_cid: Vec<u8>,
+        proposal_id: u64,
     }
 
     #[ink(storage)]
@@ -99,14 +103,37 @@ mod dao {
                 duration: 10,
                 start_block: self.env().block_number(),
                 proposal_cid,
+                proposal_id: proposal_count,
             };
-            self.proposals_list.push(proposal);
 
+            self.proposals_list.push(proposal);
             self.proposal_count = proposal_count;
             Ok(())
         }
-    }
 
+        /// Open proposal for voting
+        /// This should be done when the user is verified
+        #[ink(message)]
+        pub fn update_proposal_status(&mut self, proposal_id: u64) -> Result<()> {
+            let caller = self.env().caller();
+            let proposal = self
+                .proposals_list
+                .iter_mut()
+                .find(|p| p.proposal_id == proposal_id)
+                .ok_or(Error::InvalidAsset)?;
+
+            proposal.status = ProposalStatus::Approved;
+            self.pro
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn get_proposal_by_id(&self, proposal_id: u64) -> bool {
+            self.proposals_list
+                .iter()
+                .any(|p| p.proposal_id == proposal_id)
+        }
+    }
     // #[cfg(test)]
     // mod tests {
     //     use super::*;
