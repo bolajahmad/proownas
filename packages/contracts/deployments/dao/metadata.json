@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x59c6e4e1841a625c2827060f3439e6aacb8fccc7b8f917aee32e67afeaa418ff",
+    "hash": "0x57eb14a749f8e7f320d33e01dd41c55de9ed58a306c5197db393d2ba8275c446",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -30,7 +30,7 @@
               "displayName": [
                 "Vec"
               ],
-              "type": 4
+              "type": 0
             }
           }
         ],
@@ -45,7 +45,7 @@
             "ink_primitives",
             "ConstructorResult"
           ],
-          "type": 10
+          "type": 8
         },
         "selector": "0x9bae9d5e"
       }
@@ -56,45 +56,151 @@
         "displayName": [
           "AccountId"
         ],
-        "type": 8
+        "type": 6
       },
       "balance": {
         "displayName": [
           "Balance"
         ],
-        "type": 18
+        "type": 3
       },
       "blockNumber": {
         "displayName": [
           "BlockNumber"
         ],
-        "type": 3
+        "type": 2
       },
       "chainExtension": {
         "displayName": [
           "ChainExtension"
         ],
-        "type": 20
+        "type": 23
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 19
+        "type": 22
       },
       "maxEventTopics": 4,
       "timestamp": {
         "displayName": [
           "Timestamp"
         ],
-        "type": 6
+        "type": 5
       }
     },
     "events": [
       {
-        "args": [],
+        "args": [
+          {
+            "docs": [],
+            "indexed": true,
+            "label": "owner",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 6
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "proposal_cid",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "updated_at",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "proposal_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          }
+        ],
         "docs": [],
-        "label": "ProposaUpdated"
+        "label": "ProposalUpdated"
+      },
+      {
+        "args": [
+          {
+            "docs": [],
+            "indexed": true,
+            "label": "voter",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 6
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "updated_at",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "proposal_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "votes_for",
+            "type": {
+              "displayName": [
+                "Option"
+              ],
+              "type": 21
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "votes_against",
+            "type": {
+              "displayName": [
+                "Option"
+              ],
+              "type": 21
+            }
+          }
+        ],
+        "docs": [],
+        "label": "VoteUpdated"
       }
     ],
     "lang_error": {
@@ -102,7 +208,7 @@
         "ink",
         "LangError"
       ],
-      "type": 12
+      "type": 10
     },
     "messages": [
       {
@@ -113,16 +219,17 @@
               "displayName": [
                 "Vec"
               ],
-              "type": 4
+              "type": 0
             }
           }
         ],
         "default": false,
         "docs": [
           " Submit a new proposal to the DAO",
+          " anyone can call this function to submit a proposal for asset",
           " @param proposal_cid: IPFS CID of the proposal."
         ],
-        "label": "submit_new_proposal",
+        "label": "submit_new_asset",
         "mutates": true,
         "payable": false,
         "returnType": {
@@ -130,9 +237,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 13
+          "type": 11
         },
-        "selector": "0xa9b6109b"
+        "selector": "0xa0d9ec9a"
       },
       {
         "args": [
@@ -140,9 +247,73 @@
             "label": "proposal_id",
             "type": {
               "displayName": [
-                "u64"
+                "u128"
               ],
-              "type": 6
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Open proposal for voting",
+          " This should be done when the user is verified"
+        ],
+        "label": "activate_voting",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0xd68f9f61"
+      },
+      {
+        "args": [
+          {
+            "label": "proposal_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "vote",
+            "type": {
+              "displayName": [
+                "VoteType"
+              ],
+              "type": 14
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "vote_on_proposal",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0xa7072938"
+      },
+      {
+        "args": [
+          {
+            "label": "proposal_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
             }
           }
         ],
@@ -156,9 +327,35 @@
             "ink",
             "MessageResult"
           ],
-          "type": 16
+          "type": 15
         },
         "selector": "0x9d880359"
+      },
+      {
+        "args": [
+          {
+            "label": "proposal_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "get_proposal_ipfs_data",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 19
+        },
+        "selector": "0x9575936f"
       }
     ]
   },
@@ -169,12 +366,95 @@
           "fields": [
             {
               "layout": {
-                "leaf": {
-                  "key": "0x00000000",
-                  "ty": 0
+                "root": {
+                  "layout": {
+                    "leaf": {
+                      "key": "0x04272377",
+                      "ty": 0
+                    }
+                  },
+                  "root_key": "0x04272377"
                 }
               },
-              "name": "proposals_list"
+              "name": "cid_by_proposal_id"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "struct": {
+                      "fields": [
+                        {
+                          "layout": {
+                            "enum": {
+                              "dispatchKey": "0x511a0c74",
+                              "name": "ProposalStatus",
+                              "variants": {
+                                "0": {
+                                  "fields": [],
+                                  "name": "Pending"
+                                },
+                                "1": {
+                                  "fields": [],
+                                  "name": "Ongoing"
+                                },
+                                "2": {
+                                  "fields": [],
+                                  "name": "Approved"
+                                },
+                                "3": {
+                                  "fields": [],
+                                  "name": "Rejected"
+                                }
+                              }
+                            }
+                          },
+                          "name": "status"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x511a0c74",
+                              "ty": 2
+                            }
+                          },
+                          "name": "start_block"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x511a0c74",
+                              "ty": 2
+                            }
+                          },
+                          "name": "duration"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x511a0c74",
+                              "ty": 0
+                            }
+                          },
+                          "name": "proposal_cid"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x511a0c74",
+                              "ty": 3
+                            }
+                          },
+                          "name": "proposal_id"
+                        }
+                      ],
+                      "name": "Proposal"
+                    }
+                  },
+                  "root_key": "0x511a0c74"
+                }
+              },
+              "name": "proposal_by_id"
             },
             {
               "layout": {
@@ -182,7 +462,7 @@
                   "layout": {
                     "leaf": {
                       "key": "0x968a340f",
-                      "ty": 7
+                      "ty": 4
                     }
                   },
                   "root_key": "0x968a340f"
@@ -194,7 +474,7 @@
               "layout": {
                 "leaf": {
                   "key": "0x00000000",
-                  "ty": 6
+                  "ty": 3
                 }
               },
               "name": "proposal_count"
@@ -203,9 +483,82 @@
               "layout": {
                 "root": {
                   "layout": {
+                    "struct": {
+                      "fields": [
+                        {
+                          "layout": {
+                            "enum": {
+                              "dispatchKey": "0xc1582d1d",
+                              "name": "Option",
+                              "variants": {
+                                "0": {
+                                  "fields": [],
+                                  "name": "None"
+                                },
+                                "1": {
+                                  "fields": [
+                                    {
+                                      "layout": {
+                                        "leaf": {
+                                          "key": "0xc1582d1d",
+                                          "ty": 5
+                                        }
+                                      },
+                                      "name": "0"
+                                    }
+                                  ],
+                                  "name": "Some"
+                                }
+                              }
+                            }
+                          },
+                          "name": "votes_for"
+                        },
+                        {
+                          "layout": {
+                            "enum": {
+                              "dispatchKey": "0xc1582d1d",
+                              "name": "Option",
+                              "variants": {
+                                "0": {
+                                  "fields": [],
+                                  "name": "None"
+                                },
+                                "1": {
+                                  "fields": [
+                                    {
+                                      "layout": {
+                                        "leaf": {
+                                          "key": "0xc1582d1d",
+                                          "ty": 5
+                                        }
+                                      },
+                                      "name": "0"
+                                    }
+                                  ],
+                                  "name": "Some"
+                                }
+                              }
+                            }
+                          },
+                          "name": "votes_against"
+                        }
+                      ],
+                      "name": "Vote"
+                    }
+                  },
+                  "root_key": "0xc1582d1d"
+                }
+              },
+              "name": "votes_by_proposal"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
                     "leaf": {
                       "key": "0x22556c26",
-                      "ty": 8
+                      "ty": 6
                     }
                   },
                   "root_key": "0x22556c26"
@@ -235,76 +588,23 @@
       "id": 1,
       "type": {
         "def": {
-          "composite": {
-            "fields": [
-              {
-                "name": "status",
-                "type": 2,
-                "typeName": "ProposalStatus"
-              },
-              {
-                "name": "start_block",
-                "type": 3,
-                "typeName": "u32"
-              },
-              {
-                "name": "duration",
-                "type": 3,
-                "typeName": "u32"
-              },
-              {
-                "name": "proposal_cid",
-                "type": 4,
-                "typeName": "Vec<u8>"
-              },
-              {
-                "name": "proposal_id",
-                "type": 6,
-                "typeName": "u64"
-              }
-            ]
-          }
-        },
-        "path": [
-          "dao",
-          "dao",
-          "Proposal"
-        ]
+          "primitive": "u8"
+        }
       }
     },
     {
       "id": 2,
       "type": {
         "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "Pending"
-              },
-              {
-                "index": 1,
-                "name": "Approved"
-              },
-              {
-                "index": 2,
-                "name": "Rejected"
-              }
-            ]
-          }
-        },
-        "path": [
-          "dao",
-          "dao",
-          "ProposalStatus"
-        ]
+          "primitive": "u32"
+        }
       }
     },
     {
       "id": 3,
       "type": {
         "def": {
-          "primitive": "u32"
+          "primitive": "u128"
         }
       }
     },
@@ -313,7 +613,7 @@
       "type": {
         "def": {
           "sequence": {
-            "type": 5
+            "type": 3
           }
         }
       }
@@ -322,7 +622,7 @@
       "id": 5,
       "type": {
         "def": {
-          "primitive": "u8"
+          "primitive": "u64"
         }
       }
     },
@@ -330,28 +630,10 @@
       "id": 6,
       "type": {
         "def": {
-          "primitive": "u64"
-        }
-      }
-    },
-    {
-      "id": 7,
-      "type": {
-        "def": {
-          "sequence": {
-            "type": 6
-          }
-        }
-      }
-    },
-    {
-      "id": 8,
-      "type": {
-        "def": {
           "composite": {
             "fields": [
               {
-                "type": 9,
+                "type": 7,
                 "typeName": "[u8; 32]"
               }
             ]
@@ -365,18 +647,18 @@
       }
     },
     {
-      "id": 9,
+      "id": 7,
       "type": {
         "def": {
           "array": {
             "len": 32,
-            "type": 5
+            "type": 1
           }
         }
       }
     },
     {
-      "id": 10,
+      "id": 8,
       "type": {
         "def": {
           "variant": {
@@ -384,7 +666,7 @@
               {
                 "fields": [
                   {
-                    "type": 11
+                    "type": 9
                   }
                 ],
                 "index": 0,
@@ -393,7 +675,7 @@
               {
                 "fields": [
                   {
-                    "type": 12
+                    "type": 10
                   }
                 ],
                 "index": 1,
@@ -405,11 +687,11 @@
         "params": [
           {
             "name": "T",
-            "type": 11
+            "type": 9
           },
           {
             "name": "E",
-            "type": 12
+            "type": 10
           }
         ],
         "path": [
@@ -418,7 +700,7 @@
       }
     },
     {
-      "id": 11,
+      "id": 9,
       "type": {
         "def": {
           "tuple": []
@@ -426,7 +708,7 @@
       }
     },
     {
-      "id": 12,
+      "id": 10,
       "type": {
         "def": {
           "variant": {
@@ -445,7 +727,7 @@
       }
     },
     {
-      "id": 13,
+      "id": 11,
       "type": {
         "def": {
           "variant": {
@@ -453,7 +735,7 @@
               {
                 "fields": [
                   {
-                    "type": 14
+                    "type": 12
                   }
                 ],
                 "index": 0,
@@ -462,7 +744,7 @@
               {
                 "fields": [
                   {
-                    "type": 12
+                    "type": 10
                   }
                 ],
                 "index": 1,
@@ -474,15 +756,89 @@
         "params": [
           {
             "name": "T",
-            "type": 14
+            "type": 12
           },
           {
             "name": "E",
-            "type": 12
+            "type": 10
           }
         ],
         "path": [
           "Result"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 9
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 9
+          },
+          {
+            "name": "E",
+            "type": 13
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "AlreadyVoted"
+              },
+              {
+                "index": 1,
+                "name": "InvalidAsset"
+              },
+              {
+                "index": 2,
+                "name": "ProposalNotFound"
+              },
+              {
+                "index": 3,
+                "name": "AsserExists"
+              }
+            ]
+          }
+        },
+        "path": [
+          "dao",
+          "dao",
+          "Error"
         ]
       }
     },
@@ -495,7 +851,43 @@
               {
                 "fields": [
                   {
-                    "type": 11
+                    "type": 5,
+                    "typeName": "u64"
+                  }
+                ],
+                "index": 0,
+                "name": "Yes"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 5,
+                    "typeName": "u64"
+                  }
+                ],
+                "index": 1,
+                "name": "No"
+              }
+            ]
+          }
+        },
+        "path": [
+          "dao",
+          "dao",
+          "VoteType"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 16
                   }
                 ],
                 "index": 0,
@@ -504,7 +896,7 @@
               {
                 "fields": [
                   {
-                    "type": 15
+                    "type": 10
                   }
                 ],
                 "index": 1,
@@ -516,39 +908,15 @@
         "params": [
           {
             "name": "T",
-            "type": 11
+            "type": 16
           },
           {
             "name": "E",
-            "type": 15
+            "type": 10
           }
         ],
         "path": [
           "Result"
-        ]
-      }
-    },
-    {
-      "id": 15,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "InvalidAsset"
-              },
-              {
-                "index": 1,
-                "name": "AsserExists"
-              }
-            ]
-          }
-        },
-        "path": [
-          "dao",
-          "dao",
-          "Error"
         ]
       }
     },
@@ -570,7 +938,7 @@
               {
                 "fields": [
                   {
-                    "type": 12
+                    "type": 13
                   }
                 ],
                 "index": 1,
@@ -586,7 +954,7 @@
           },
           {
             "name": "E",
-            "type": 12
+            "type": 13
           }
         ],
         "path": [
@@ -598,26 +966,200 @@
       "id": 17,
       "type": {
         "def": {
-          "primitive": "bool"
-        }
+          "composite": {
+            "fields": [
+              {
+                "name": "status",
+                "type": 18,
+                "typeName": "ProposalStatus"
+              },
+              {
+                "name": "start_block",
+                "type": 2,
+                "typeName": "u32"
+              },
+              {
+                "name": "duration",
+                "type": 2,
+                "typeName": "u32"
+              },
+              {
+                "name": "proposal_cid",
+                "type": 0,
+                "typeName": "Vec<u8>"
+              },
+              {
+                "name": "proposal_id",
+                "type": 3,
+                "typeName": "u128"
+              }
+            ]
+          }
+        },
+        "path": [
+          "dao",
+          "dao",
+          "Proposal"
+        ]
       }
     },
     {
       "id": 18,
       "type": {
         "def": {
-          "primitive": "u128"
-        }
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "Pending"
+              },
+              {
+                "index": 1,
+                "name": "Ongoing"
+              },
+              {
+                "index": 2,
+                "name": "Approved"
+              },
+              {
+                "index": 3,
+                "name": "Rejected"
+              }
+            ]
+          }
+        },
+        "path": [
+          "dao",
+          "dao",
+          "ProposalStatus"
+        ]
       }
     },
     {
       "id": 19,
       "type": {
         "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 20
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 10
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 20
+          },
+          {
+            "name": "E",
+            "type": 10
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 0
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          },
+          {
+            "name": "E",
+            "type": 13
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "None"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 1,
+                "name": "Some"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 5
+          }
+        ],
+        "path": [
+          "Option"
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "type": {
+        "def": {
           "composite": {
             "fields": [
               {
-                "type": 9,
+                "type": 7,
                 "typeName": "[u8; 32]"
               }
             ]
@@ -631,7 +1173,7 @@
       }
     },
     {
-      "id": 20,
+      "id": 23,
       "type": {
         "def": {
           "variant": {}
