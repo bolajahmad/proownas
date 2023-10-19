@@ -14,8 +14,8 @@ export const useDAOProposal = () => {
   const [countLoading, setCountLoading] = useState(false)
   const [fetchingProposal, setFetchingProposal] = useState(false)
 
-  const { api, activeAccount, activeSigner } = useInkathon()
-  const { contract, address: contractAddress } = useRegisteredContract(ContractIds.Dao)
+  const { api } = useInkathon()
+  const { contract } = useRegisteredContract(ContractIds.Dao)
 
   // Fetch Proposal Count
   const fetchProposalCount = async () => {

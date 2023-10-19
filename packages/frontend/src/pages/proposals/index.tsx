@@ -1,6 +1,7 @@
 import { Button } from '@chakra-ui/react'
 import { HomePageTitle } from '@components/home/HomePageTitle'
 import { CenterBody } from '@components/layout/CenterBody'
+import { CreateProposalView } from '@components/proposals/CreateProposalView'
 import { ProposalView } from '@components/proposals/ProposalView'
 import { ChainInfo } from '@components/web3/ChainInfo'
 import { GreeterContractInteractions } from '@components/web3/GreeterContractInteractions'
@@ -26,10 +27,7 @@ const HomePage: NextPage = () => {
           <h2 tw="font-bold text-3xl">Proposals</h2>
 
           <div>
-            <Button tw="flex items-center gap-3 bg-blue-500 text-lg hover:bg-blue-700">
-              <AiOutlinePlusCircle size={20} />
-              Create Proposal
-            </Button>
+            <CreateProposalView />
           </div>
         </div>
 
