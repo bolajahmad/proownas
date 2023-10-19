@@ -28,19 +28,23 @@ The purpose of the DAO is to collectively make decisions on properties, membersh
 ### The DAO
 
 #### Storage
+
  ```
     #[ink(storage)]
     #[derive(Default)]
     pub struct DAO {
         cid_by_proposal_id: Mapping<u128, Vec<u8>>,
-        proposals_by_id: Mapping<u128, Proposal>,
+        proposal_by_id: Mapping<u128, Proposal>,
         proposals_by_account: Mapping<AccountId, Vec<u128>>,
-        proposal_count: u64,
+        proposal_count: u128,
+        votes_by_proposal: Mapping<(u128, AccountId), Vote>,
         assets_owned: Mapping<Vec<u8>, AccountId>,
+        token_contract: AccountId,
     }
 ```
 
 ####  Messages
 
 **Submit new asset**
-Allows user to register. Technically, you're submitting your asset cid along with your wallet address, and the proposal count will be incremented as every action is a proposal. 
+Anyone can submit a new proposal/asset. Once a proposal is submitted, an off-chain verification process begins and the result of this off-chain process is announced by an Oracle (for now the Oracle is missing).
+

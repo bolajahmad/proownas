@@ -1,7 +1,7 @@
 {
-  "name": "@inkathon/frontend",
+  "name": "proownas-dao-frontend",
   "version": "0.0.1",
-  "homepage": "https://inkathon.xyz",
+  "homepage": "https://proownas-hack.xyz",
   "babelMacros": {
     "twin": {
       "preset": "emotion"
@@ -26,6 +26,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.11.0",
+    "@headlessui/react": "^1.7.17",
     "@inkathon/contracts": "workspace:*",
     "@polkadot/api": "^10.9.1",
     "@polkadot/api-contract": "^10.9.1",

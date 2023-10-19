@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x57eb14a749f8e7f320d33e01dd41c55de9ed58a306c5197db393d2ba8275c446",
+    "hash": "0x06698017d53deaca5802fc6dd65d888079a7984cf3c4b66bdd1f92b357f08b73",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -74,13 +74,13 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 23
+        "type": 27
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 22
+        "type": 26
       },
       "maxEventTopics": 4,
       "timestamp": {
@@ -184,7 +184,7 @@
               "displayName": [
                 "Option"
               ],
-              "type": 21
+              "type": 25
             }
           },
           {
@@ -195,7 +195,7 @@
               "displayName": [
                 "Option"
               ],
-              "type": 21
+              "type": 25
             }
           }
         ],
@@ -221,14 +221,19 @@
               ],
               "type": 0
             }
+          },
+          {
+            "label": "days",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 2
+            }
           }
         ],
         "default": false,
-        "docs": [
-          " Submit a new proposal to the DAO",
-          " anyone can call this function to submit a proposal for asset",
-          " @param proposal_cid: IPFS CID of the proposal."
-        ],
+        "docs": [],
         "label": "submit_new_asset",
         "mutates": true,
         "payable": false,
@@ -308,6 +313,83 @@
       {
         "args": [
           {
+            "label": "owner",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 6
+            }
+          },
+          {
+            "label": "proposal_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "verify_proposal_by_id",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 15
+        },
+        "selector": "0x774f8182"
+      },
+      {
+        "args": [
+          {
+            "label": "token_contract",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 6
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "set_token_contract",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 8
+        },
+        "selector": "0x2fc3cfae"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "get_token_contract",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 17
+        },
+        "selector": "0xad4a397f"
+      },
+      {
+        "args": [
+          {
             "label": "proposal_id",
             "type": {
               "displayName": [
@@ -327,7 +409,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 15
+          "type": 18
         },
         "selector": "0x9d880359"
       },
@@ -353,9 +435,25 @@
             "ink",
             "MessageResult"
           ],
-          "type": 19
+          "type": 22
         },
         "selector": "0x9575936f"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "total_proposals",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 24
+        },
+        "selector": "0x4e8d8fac"
       }
     ]
   },
@@ -565,6 +663,15 @@
                 }
               },
               "name": "assets_owned"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 6
+                }
+              },
+              "name": "token_contract"
             }
           ],
           "name": "DAO"
@@ -831,6 +938,10 @@
               {
                 "index": 3,
                 "name": "AsserExists"
+              },
+              {
+                "index": 4,
+                "name": "TokenMintingFailed"
               }
             ]
           }
@@ -924,12 +1035,104 @@
       "id": 16,
       "type": {
         "def": {
+          "primitive": "bool"
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
           "variant": {
             "variants": [
               {
                 "fields": [
                   {
-                    "type": 17
+                    "type": 6
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 10
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 6
+          },
+          {
+            "name": "E",
+            "type": 10
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 19
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 10
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 19
+          },
+          {
+            "name": "E",
+            "type": 10
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 20
                   }
                 ],
                 "index": 0,
@@ -950,7 +1153,7 @@
         "params": [
           {
             "name": "T",
-            "type": 17
+            "type": 20
           },
           {
             "name": "E",
@@ -963,14 +1166,14 @@
       }
     },
     {
-      "id": 17,
+      "id": 20,
       "type": {
         "def": {
           "composite": {
             "fields": [
               {
                 "name": "status",
-                "type": 18,
+                "type": 21,
                 "typeName": "ProposalStatus"
               },
               {
@@ -1004,7 +1207,7 @@
       }
     },
     {
-      "id": 18,
+      "id": 21,
       "type": {
         "def": {
           "variant": {
@@ -1036,7 +1239,7 @@
       }
     },
     {
-      "id": 19,
+      "id": 22,
       "type": {
         "def": {
           "variant": {
@@ -1044,7 +1247,7 @@
               {
                 "fields": [
                   {
-                    "type": 20
+                    "type": 23
                   }
                 ],
                 "index": 0,
@@ -1065,7 +1268,7 @@
         "params": [
           {
             "name": "T",
-            "type": 20
+            "type": 23
           },
           {
             "name": "E",
@@ -1078,7 +1281,7 @@
       }
     },
     {
-      "id": 20,
+      "id": 23,
       "type": {
         "def": {
           "variant": {
@@ -1120,7 +1323,49 @@
       }
     },
     {
-      "id": 21,
+      "id": 24,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 3
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 10
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 3
+          },
+          {
+            "name": "E",
+            "type": 10
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 25,
       "type": {
         "def": {
           "variant": {
@@ -1153,7 +1398,7 @@
       }
     },
     {
-      "id": 22,
+      "id": 26,
       "type": {
         "def": {
           "composite": {
@@ -1173,7 +1418,7 @@
       }
     },
     {
-      "id": 23,
+      "id": 27,
       "type": {
         "def": {
           "variant": {}
