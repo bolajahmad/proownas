@@ -71,6 +71,8 @@ mod dao {
         status: ProposalStatus,
         start_block: u32,
         duration: u32,
+        proposer: AccountId,
+        created_at: u32,
         proposal_cid: Vec<u8>,
         proposal_id: u128,
     }
@@ -116,10 +118,16 @@ mod dao {
         /* Submit a new proposal to the DAO
          ** anyone can call this function to submit a proposal for asset
          ** @param proposal_cid: IPFS CID of the proposal.
+         ** @param created_at: UNIX timestamp when pproposal was created
          ** @param days: duration of the voting period in days
          */
         #[ink(message)]
-        pub fn submit_new_asset(&mut self, proposal_cid: Vec<u8>, days: u32) -> Result<()> {
+        pub fn submit_new_asset(
+            &mut self,
+            proposal_cid: Vec<u8>,
+            created_at: u32,
+            days: u32,
+        ) -> Result<()> {
             let caller: AccountId = self.env().caller();
             let mut proposals_of = self.proposals_by_account.get(&caller).unwrap_or(Vec::new());
 
@@ -145,6 +153,8 @@ mod dao {
                 status: ProposalStatus::Pending,
                 duration,
                 start_block: self.env().block_number(),
+                proposer: caller,
+                created_at,
                 proposal_cid: proposal_cid.clone(),
                 proposal_id: proposal_count,
             };
@@ -329,7 +339,7 @@ mod dao {
         }
 
         #[ink(message)]
-        pub fn total_proposals(&self) -> u128 {
+        pub fn get_proposal_count(&self) -> u128 {
             self.proposal_count
         }
     }

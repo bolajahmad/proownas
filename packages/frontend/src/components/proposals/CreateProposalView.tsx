@@ -46,7 +46,7 @@ export const CreateProposalView = () => {
             <div tw="mt-4 w-full">
               {isOpen === 1 && (
                 <ProposalDetailForm
-                  onComplete={(values) => console.log({ values })}
+                  onComplete={() => setIsOpen(false)}
                   onCancel={() => setIsOpen(false)}
                 />
               )}
@@ -92,7 +92,6 @@ const ProposalDetailForm = ({
     const files = values.files
     const client = makeWeb3StorageClient()
     const filesCid = await client.put(files)
-    console.log({ filesCid })
 
     const proposalToStore = {
       description: values.description,
@@ -102,7 +101,6 @@ const ProposalDetailForm = ({
     const proposal_blob = new Blob([JSON.stringify(proposalToStore)], { type: 'application/json' })
     const proposal_files = [new File([proposal_blob], `proposal.json`)]
     const proposalCID = await client.put(proposal_files)
-    console.log({ proposalCID })
 
     createProposal(proposalCID, values.duration)
 

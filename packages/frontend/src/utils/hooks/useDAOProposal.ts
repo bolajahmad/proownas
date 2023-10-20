@@ -78,5 +78,6 @@ export const useDAOProposal = () => {
   return {
     proposalCount,
     proposals,
+    fetchProposalById,
   }
 }

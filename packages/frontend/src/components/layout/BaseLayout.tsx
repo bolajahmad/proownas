@@ -11,7 +11,7 @@ export const BaseLayout: FC<PropsWithChildren> = ({ children }) => {
           <aside tw="w-full max-w-xs">
             <Sidebar />
           </aside>
-          <main tw="relative flex grow flex-col bg-gray-800">
+          <main tw="relative flex h-full grow flex-col overflow-auto bg-gray-800 pb-14">
             <Navbar />
             {children}
           </main>

@@ -46,5 +46,5 @@ The purpose of the DAO is to collectively make decisions on properties, membersh
 ####  Messages
 
 **Submit new asset**
-Anyone can submit a new proposal/asset. Once a proposal is submitted, an off-chain verification process begins and the result of this off-chain process is announced by an Oracle (for now the Oracle is missing).
+Anyone, within the DAO, can submit a new proposal/asset. Once a proposal is submitted, an off-chain verification process begins and the result of this off-chain process is announced by an Oracle (for now the Oracle is missing).
 

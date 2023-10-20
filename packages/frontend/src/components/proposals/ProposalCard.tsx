@@ -8,12 +8,13 @@ const cardCss = css`
 
 export const ProposalCard: React.FC<any> = ({ status, ...proposal }) => {
   const router = useRouter()
+  console.log({ proposal, status })
   return (
     <div
       css={cardCss}
       tw="col-span-1 w-full scale-95 rounded-lg border border-pink-100 bg-gray-700 px-6 py-3 shadow-xl transition hover:scale-100"
     >
-      <div onClick={() => router.push(`/proposals/${proposal.id}`)}>
+      <div onClick={() => router.push(`/proposals/${proposal.proposalId}`)}>
         <div tw="flex items-center justify-between">
           <div tw="flex flex-1 items-center justify-start gap-2 font-medium text-sm">
             <div tw="p-1 font-extrabold text-xl text-blue-700">

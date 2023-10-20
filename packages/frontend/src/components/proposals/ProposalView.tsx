@@ -14,8 +14,7 @@ const TabStates = [
 ]
 
 export const ProposalView = () => {
-  const { count: proposalCount, proposals: allProposals } = useProownasDAOContext()!
-  console.log({ allProposals })
+  const { proposals: allProposals } = useProownasDAOContext()!
 
   const proposals = useCallback(
     (status: ProposalStatus | 'All') => {
