@@ -1,31 +1,26 @@
-import {
-  Badge,
-  Button,
-  Table,
-  TableCaption,
-  TableContainer,
-  Tbody,
-  Td,
-  Tfoot,
-  Th,
-  Thead,
-  Tr,
-} from '@chakra-ui/react'
-import { ProposalStatus } from '@types/customs'
+import { Badge, Button, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
+import { ProposalStatus } from '../../types/customs'
 import { useFetchProposal } from '@utils/hooks/useSingleProposal'
 import { useVoteOnProposal } from '@utils/hooks/useVoteOnProposal'
 import Link from 'next/link'
 import 'twin.macro'
+import { useProownasDAOContext } from '@context/ProownasDAO'
+import { useEffect } from 'react'
+import { ProposalVotingActionsView } from './ProposalVotingActionsView'
 
 export const ProposalById = ({ id }: { id: string }) => {
-  const { rawProposal, proposalMetadata, proposalFiles } = useFetchProposal(id)
-  const { activateVoting } = useVoteOnProposal()
-  console.log({ rawProposal, proposalMetadata, proposalFiles })
+  const { fetchProposalById, selectedProposal } = useProownasDAOContext()!
+  const { proposalMetadata, proposalFiles } = useFetchProposal(id)
+  console.log({ selectedProposal, proposalMetadata, proposalFiles })
+
+  useEffect(() => {
+    fetchProposalById(Number(id))
+  }, [id])
 
   return (
     <div tw="grid grid-cols-1 gap-10 md:grid-cols-2">
       <section tw="rounded-md bg-gray-900 p-3">
-        <h2 tw="font-bold text-3xl">Proposal of {rawProposal?.proposer ?? '#'}</h2>
+        <h2 tw="font-bold text-3xl">Proposal of {selectedProposal?.proposer ?? '#'}</h2>
         <p tw="mt-6">{proposalMetadata?.description}</p>
 
         <div tw="mt-12">
@@ -61,39 +56,34 @@ export const ProposalById = ({ id }: { id: string }) => {
           <span tw="font-bold text-3xl">Activities</span>
 
           <Badge variant="solid" tw="mt-3 ml-6 rounded-lg py-1 px-3">
-            {rawProposal?.status}
+            {selectedProposal?.status}
           </Badge>
         </h2>
 
         <div tw="mt-12">
           <ul tw="flex w-full flex-col gap-2 text-lg">
             <li>
-              <strong tw="text-gray-200">Proposed by:</strong> <span>{rawProposal?.proposer}</span>
+              <strong tw="text-gray-200">Proposed by:</strong>{' '}
+              <span>{selectedProposal?.proposer}</span>
             </li>
             <li>
               <strong tw="text-gray-200">Start block:</strong>{' '}
-              <span>{rawProposal?.startBlock}</span>
+              <span>{selectedProposal?.startBlock}</span>
             </li>
             <li>
               <strong tw="text-gray-200">Vote duration:</strong>{' '}
-              <span>{rawProposal?.duration} blocks</span>
+              <span>{selectedProposal?.duration} blocks</span>
             </li>
             <li>
               <strong tw="text-gray-200">Voting active:</strong>{' '}
               <span tw="uppercase">
-                {rawProposal?.status == ProposalStatus.Ongoing ? 'true' : 'false'}
+                {selectedProposal?.status == ProposalStatus.Ongoing ? 'true' : 'false'}
               </span>
             </li>
           </ul>
         </div>
 
-        {rawProposal?.status == ProposalStatus.Pending && (
-          <div tw="mt-8 ml-auto w-fit">
-            <Button tw="bg-blue-500 hover:bg-blue-700" onClick={() => activateVoting(Number(id))}>
-              Activate Voting
-            </Button>
-          </div>
-        )}
+        <ProposalVotingActionsView id={id} />
       </section>
 
       <section tw="rounded-md bg-gray-900 p-3 md:col-span-2">

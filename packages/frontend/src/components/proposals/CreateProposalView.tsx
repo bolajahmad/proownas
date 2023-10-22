@@ -102,9 +102,7 @@ const ProposalDetailForm = ({
     const proposal_files = [new File([proposal_blob], `proposal.json`)]
     const proposalCID = await client.put(proposal_files)
 
-    createProposal(proposalCID, values.duration)
-
-    onComplete(values)
+    createProposal(proposalCID, values.duration).then(() => onComplete())
   }
 
   return (

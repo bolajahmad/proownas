@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import 'twin.macro'
 
-const HomePage: NextPage = () => {
+const ProposalByIdPage: NextPage = () => {
   // Display `useInkathon` error messages (optional)
   const { error } = useInkathon()
   useEffect(() => {
@@ -33,4 +33,4 @@ const HomePage: NextPage = () => {
   )
 }
 
-export default HomePage
+export default ProposalByIdPage

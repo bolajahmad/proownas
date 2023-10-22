@@ -1,13 +1,20 @@
 import { HomePageTitle } from '@components/home/HomePageTitle'
 import { CenterBody } from '@components/layout/CenterBody'
 import { ChainInfo } from '@components/web3/ChainInfo'
-import { ConnectButton } from '@components/web3/ConnectButton'
 import { GreeterContractInteractions } from '@components/web3/GreeterContractInteractions'
 import { useInkathon } from '@scio-labs/use-inkathon'
 import type { NextPage } from 'next'
 import { useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import 'twin.macro'
+
+// export const getStaticProps = (async (context) => {
+//   const res = await fetch('https://api.github.com/repos/vercel/next.js')
+//   const repo = await res.json()
+//   return { props: { repo } }
+// }) satisfies GetStaticProps<{
+//   repo: Repo
+// }>
 
 const HomePage: NextPage = () => {
   // Display `useInkathon` error messages (optional)

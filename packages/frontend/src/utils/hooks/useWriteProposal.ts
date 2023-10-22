@@ -21,10 +21,12 @@ export const useWriteProposal = () => {
     try {
       await contractTxWithToast(api, activeAccount.address, contract, 'submit_new_asset', {}, [
         proposalCid,
+        new Date().getTime(),
         duration,
       ])
     } catch (error) {
       console.error(error)
+      throw error
     } finally {
       setSubmitting(false)
     }

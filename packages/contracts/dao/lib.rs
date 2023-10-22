@@ -23,6 +23,7 @@ mod dao {
         #[ink(topic)]
         voter: AccountId,
         updated_at: u32,
+        vote: VoteType,
         proposal_id: u128,
         votes_for: Option<u64>,
         votes_against: Option<u64>,
@@ -56,8 +57,8 @@ mod dao {
         derive(Debug, PartialEq, Eq, scale_info::TypeInfo, StorageLayout,)
     )]
     pub enum VoteType {
-        Yes(u64),
-        No(u64),
+        Yes,
+        No,
     }
 
     pub type Result<T> = core::result::Result<T, Error>;
@@ -72,7 +73,7 @@ mod dao {
         start_block: u32,
         duration: u32,
         proposer: AccountId,
-        created_at: u32,
+        created_at: u64,
         proposal_cid: Vec<u8>,
         proposal_id: u128,
     }
@@ -83,6 +84,7 @@ mod dao {
         derive(Debug, Clone, PartialEq, Eq, scale_info::TypeInfo, StorageLayout,)
     )]
     pub struct Vote {
+        voters: Vec<AccountId>,
         votes_for: Option<u64>,
         votes_against: Option<u64>,
     }
@@ -92,7 +94,7 @@ mod dao {
         proposal_by_id: Mapping<u128, Proposal>,
         proposals_by_account: Mapping<AccountId, Vec<u128>>,
         proposal_count: u128,
-        votes_by_proposal: Mapping<(u128, AccountId), Vote>,
+        votes_by_proposal: Mapping<u128, Vote>,
         assets_owned: Mapping<Vec<u8>, AccountId>,
         token_contract: AccountId,
     }
@@ -125,7 +127,7 @@ mod dao {
         pub fn submit_new_asset(
             &mut self,
             proposal_cid: Vec<u8>,
-            created_at: u32,
+            created_at: u64,
             days: u32,
         ) -> Result<()> {
             let caller: AccountId = self.env().caller();
@@ -207,8 +209,9 @@ mod dao {
                     });
 
                     self.votes_by_proposal.insert(
-                        &(proposal_id, caller),
+                        &proposal_id,
                         &Vote {
+                            voters: Vec::new(),
                             votes_for: Some(0),
                             votes_against: Some(0),
                         },
@@ -235,37 +238,43 @@ mod dao {
                 "ClosedProposal"
             );
 
-            let to_vote_on = self.votes_by_proposal.get(&(proposal_id, caller)).unwrap();
+            let mut existing_vote = self.votes_by_proposal.get(&proposal_id).unwrap();
+            let is_existing_user = existing_vote.voters.iter().any(|v| *v == caller);
+            assert!(!is_existing_user, "AlreadyVoted");
+
+            existing_vote.voters.push(caller);
             let new_votes = match vote {
-                VoteType::Yes(_) => {
-                    let votes_for = match to_vote_on.votes_for {
+                VoteType::Yes => {
+                    let votes_for = match existing_vote.votes_for {
                         Some(value) => value + 1,
                         None => 1,
                     };
                     let new_vote = Vote {
+                        voters: existing_vote.voters,
                         votes_for: Some(votes_for),
-                        votes_against: Some(to_vote_on.votes_against.unwrap()),
+                        votes_against: Some(existing_vote.votes_against.unwrap()),
                     };
                     new_vote
                 }
-                VoteType::No(_) => {
-                    let votes_against = match to_vote_on.votes_against {
+                VoteType::No => {
+                    let votes_against = match existing_vote.votes_against {
                         Some(value) => value + 1,
                         None => 1,
                     };
                     let new_vote = Vote {
-                        votes_for: Some(to_vote_on.votes_for.unwrap()),
+                        voters: existing_vote.voters,
+                        votes_for: Some(existing_vote.votes_for.unwrap()),
                         votes_against: Some(votes_against),
                     };
                     new_vote
                 }
             };
 
-            self.votes_by_proposal
-                .insert(&(proposal_id, caller), &new_votes);
+            self.votes_by_proposal.insert(&proposal_id, &new_votes);
 
             self.env().emit_event(VoteUpdated {
                 voter: caller,
+                vote,
                 proposal_id,
                 updated_at: block_number,
                 votes_for: new_votes.votes_for,
@@ -275,7 +284,7 @@ mod dao {
             Ok(())
         }
 
-        // #[ink(message)]
+        #[ink(message)]
         pub fn create_proposal_asset(&mut self, proposal_id: u128, owner: AccountId) -> Result<()> {
             let proposals_owned = self.proposals_by_account.get(&owner).unwrap();
             let proposal_exists = proposals_owned.iter().any(|p| *p == proposal_id);
@@ -288,21 +297,28 @@ mod dao {
             };
             assert!(is_approved_proposal, "Proposal must be approved");
 
-            let mint_result = build_call::<DefaultEnvironment>()
-                .call(self.token_contract)
-                .gas_limit(0)
-                .exec_input(
-                    ExecutionInput::new(Selector::new(ink::selector_bytes!("mint_property")))
-                        .push_arg(&owner)
-                        .push_arg(&current_proposal.proposal_cid),
-                )
-                .returns::<()>()
-                .try_invoke();
+            // let mint_result = build_call::<DefaultEnvironment>()
+            //     .call(self.token_contract)
+            //     .gas_limit(0)
+            //     .exec_input(
+            //         ExecutionInput::new(Selector::new(ink::selector_bytes!("mint_property")))
+            //             .push_arg(&owner)
+            //             .push_arg(&current_proposal.proposal_cid),
+            //     )
+            //     .returns::<()>()
+            //     .try_invoke();
 
-            match mint_result {
-                Ok(Ok(_)) => Ok(()),
-                _ => Err(Error::TokenMintingFailed),
-            }
+            // match mint_result {
+            //     Ok(Ok(_)) => Ok(()),
+            //     _ => Err(Error::TokenMintingFailed),
+            // }
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn get_all_votes_of_proposal(&self, proposal_id: u128) -> Vote {
+            let votes = self.votes_by_proposal.get(&proposal_id).unwrap();
+            votes
         }
 
         #[ink(message)]

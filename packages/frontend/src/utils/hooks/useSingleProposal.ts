@@ -6,9 +6,10 @@ import {
   useInkathon,
   useRegisteredContract,
 } from '@scio-labs/use-inkathon'
-import { Proposal } from '@types/customs'
+import { Proposal } from '../../types/customs'
 import { use, useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { useProownasDAOContext } from '@context/ProownasDAO'
 
 async function fetchMetadataByCID(cid: string) {
   try {
@@ -26,48 +27,38 @@ async function fetchMetadataByCID(cid: string) {
 }
 
 export const useFetchProposal = (proposalId: string | number) => {
-  const { api } = useInkathon()
-  const { contract } = useRegisteredContract(ContractIds.Dao)
-  const [rawProposal, setRawProposal] = useState<Proposal | null>(null)
+  const { selectedProposal } = useProownasDAOContext()!
   const [proposalMetadata, setMetadata] = useState<Record<string, any>>()
   const [proposalFiles, setFiles] = useState<any[]>([])
   const [isLoading, setLoading] = useState(false)
 
-  const fetchProposalById = async (proposalId: string | number) => {
-    if (!contract || !api) return null
-
+  const fetchProposalIPFSData = useCallback(async () => {
     setLoading(true)
     try {
-      const result = await contractQuery(api, '', contract, 'getProposalById', {}, [proposalId])
-      const { output, isError, decodedOutput } = decodeOutput(result, contract, 'getProposalById')
-      if (isError) throw new Error(decodedOutput)
-
-      setRawProposal(output.Ok)
-
       // fetch metadata from NFT Storage
-      const proposalCid = output.Ok.proposalCid
+      const proposalCid = selectedProposal?.proposalCid
 
-      const proposalFiles = await fetchMetadataByCID(proposalCid)
-      if (proposalFiles) {
-        const reader = new FileReader()
-        reader.onload = (event) => {
-          if (event.target) {
-            try {
-              const jsonData = JSON.parse(event.target.result as string)
-              setMetadata({
-                description: jsonData.description,
-                filesCID: jsonData.filesCID,
-                references: jsonData.references ? jsonData.references : undefined,
-              })
-            } catch (error) {
-              console.error(error)
+      if (proposalCid) {
+        const proposalFiles = await fetchMetadataByCID(proposalCid)
+        if (proposalFiles) {
+          const reader = new FileReader()
+          reader.onload = (event) => {
+            if (event.target) {
+              try {
+                const jsonData = JSON.parse(event.target.result as string)
+                setMetadata({
+                  description: jsonData.description,
+                  filesCID: jsonData.filesCID,
+                  references: jsonData.references ? jsonData.references : undefined,
+                })
+              } catch (error) {
+                console.error(error)
+              }
             }
           }
+          reader.readAsText(proposalFiles[0])
         }
-        reader.readAsText(proposalFiles[0])
       }
-
-      return output.Ok
     } catch (e) {
       console.error(e)
       toast.error('Error while fetching proposal count. Try again…')
@@ -75,11 +66,12 @@ export const useFetchProposal = (proposalId: string | number) => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedProposal?.proposalCid])
 
   const fetchProposalFiles = useCallback(async () => {
     if (proposalMetadata) {
       const { filesCID } = proposalMetadata as any
+      console.log({ filesCID })
 
       const metadataFiles = await fetchMetadataByCID(filesCID)
       if (metadataFiles && metadataFiles.length > 0) {
@@ -91,7 +83,6 @@ export const useFetchProposal = (proposalId: string | number) => {
             cid: file.cid,
           }
         })
-        console.log({ updatedFiles })
         setFiles(updatedFiles)
       }
     }
@@ -102,11 +93,10 @@ export const useFetchProposal = (proposalId: string | number) => {
   }, [fetchProposalFiles])
 
   useEffect(() => {
-    fetchProposalById(proposalId)
+    fetchProposalIPFSData()
   }, [])
 
   return {
-    rawProposal,
     proposalMetadata,
     proposalFiles,
   }

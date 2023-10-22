@@ -14,3 +14,8 @@ export interface Proposal {
   proposalCid: string
   proposalId: number
 }
+
+export enum VoteType {
+  Yes = 'Yes',
+  No = 'No',
+}
