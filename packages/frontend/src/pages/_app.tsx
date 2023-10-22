@@ -2,6 +2,7 @@ import { ChakraProvider, DarkMode } from '@chakra-ui/react'
 import { BaseLayout } from '@components/layout/BaseLayout'
 import { HotToastConfig } from '@components/layout/HotToastConfig'
 import { env } from '@config/environment'
+import { ProownasDaoProvider } from '@context/ProownasDAO'
 import { getDeployments } from '@deployments/deployments'
 import { cache } from '@emotion/css'
 import { CacheProvider } from '@emotion/react'
@@ -22,7 +23,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <DefaultSeo
         dangerouslySetAllPagesToNoFollow={!env.isProduction}
         dangerouslySetAllPagesToNoIndex={!env.isProduction}
-        defaultTitle="ink!athon" // TODO
+        defaultTitle="PROOWNAS"
         titleTemplate="%s | ink!athon" // TODO
         description="Substrate-based Smart Contract & DApp Development Boilerplate" // TODO
         openGraph={{
@@ -55,7 +56,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
 
       <UseInkathonProvider
-        appName="ink!athon" // TODO
+        appName="PROOWNAS"
         connectOnInit={true}
         defaultChain={env.defaultChain}
         deployments={getDeployments()}
@@ -66,7 +67,9 @@ function MyApp({ Component, pageProps }: AppProps) {
               <GlobalStyles />
 
               <BaseLayout>
-                <Component {...pageProps} />
+                <ProownasDaoProvider>
+                  <Component {...pageProps} />
+                </ProownasDaoProvider>
               </BaseLayout>
 
               <HotToastConfig />

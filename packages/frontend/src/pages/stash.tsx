@@ -1,6 +1,7 @@
 import { HomePageTitle } from '@components/home/HomePageTitle'
 import { CenterBody } from '@components/layout/CenterBody'
 import { ChainInfo } from '@components/web3/ChainInfo'
+import { ConnectButton } from '@components/web3/ConnectButton'
 import { GreeterContractInteractions } from '@components/web3/GreeterContractInteractions'
 import { useInkathon } from '@scio-labs/use-inkathon'
 import type { NextPage } from 'next'
@@ -8,15 +9,7 @@ import { useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import 'twin.macro'
 
-// export const getStaticProps = (async (context) => {
-//   const res = await fetch('https://api.github.com/repos/vercel/next.js')
-//   const repo = await res.json()
-//   return { props: { repo } }
-// }) satisfies GetStaticProps<{
-//   repo: Repo
-// }>
-
-const HomePage: NextPage = () => {
+const StashPage: NextPage = () => {
   // Display `useInkathon` error messages (optional)
   const { error } = useInkathon()
   useEffect(() => {
@@ -30,6 +23,9 @@ const HomePage: NextPage = () => {
         {/* Title */}
         <HomePageTitle />
 
+        {/* Connect Wallet Button */}
+        <ConnectButton />
+
         <div tw="mt-10 flex w-full flex-wrap items-start justify-center gap-4">
           {/* Chain Metadata Information */}
           <ChainInfo />
@@ -42,4 +38,4 @@ const HomePage: NextPage = () => {
   )
 }
 
-export default HomePage
+export default StashPage

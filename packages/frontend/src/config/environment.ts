@@ -13,4 +13,7 @@ export const env = {
 
   defaultChain: process.env.NEXT_PUBLIC_DEFAULT_CHAIN!,
   supportedChains: getSupportedChains(),
+
+  web3Storage: process.env.NEXT_PUBLIC_WEB3STORAGE_TOKEN!,
+  nftStorage: process.env.NEXT_PUBLIC_NFTSTORAGE_TOKEN!,
 }

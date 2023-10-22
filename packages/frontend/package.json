@@ -1,7 +1,7 @@
 {
-  "name": "@inkathon/frontend",
+  "name": "proownas-dao-frontend",
   "version": "0.0.1",
-  "homepage": "https://inkathon.xyz",
+  "homepage": "https://proownas-hack.xyz",
   "babelMacros": {
     "twin": {
       "preset": "emotion"
@@ -26,6 +26,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.11.0",
+    "@headlessui/react": "^1.7.17",
     "@inkathon/contracts": "workspace:*",
     "@polkadot/api": "^10.9.1",
     "@polkadot/api-contract": "^10.9.1",
@@ -38,6 +39,7 @@
     "@scio-labs/use-inkathon": "^0.0.8",
     "next": "^13.4.19",
     "next-seo": "^6.1.0",
+    "nft.storage": "^7.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.46.1",
@@ -45,7 +47,8 @@
     "react-icons": "^4.11.0",
     "sharp": "^0.32.5",
     "spinners-react": "^1.0.7",
-    "use-async-effect": "^2.2.7"
+    "use-async-effect": "^2.2.7",
+    "web3.storage": "^4.5.5"
   },
   "devDependencies": {
     "@babel/core": "^7.22.20",
