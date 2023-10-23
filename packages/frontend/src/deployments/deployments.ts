@@ -14,7 +14,7 @@ export const getDeployments = async (): Promise<SubstrateDeployment[]> => {
         contractId: ContractIds.Dao,
         networkId: network,
         abi: await import(`@inkathon/contracts/deployments/dao/metadata.json`),
-        address: 'WLxcTuqKGyCd5fEKWYQcBTDYUYfPQfHyGPwgpPmgBh5Fp92',
+        address: 'aKv9HJgdf9igYPhubWJ35kNxUL8odviSQZLbGtt7XamhrRv',
       },
       {
         contractId: ContractIds.PropertyToken,

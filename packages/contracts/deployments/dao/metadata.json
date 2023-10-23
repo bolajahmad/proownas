@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x5cb96c4b9c16ff1322ae228a4c353d0f2b340e155b99ef0a91f2124197aaedf2",
+    "hash": "0xa9098ab65681eae09e82279fe4ece1279e582aee39f98e1e39aaad093a11338f",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -329,6 +329,32 @@
           "type": 12
         },
         "selector": "0xa7072938"
+      },
+      {
+        "args": [
+          {
+            "label": "proposal_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 6
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "close_voting_period",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 12
+        },
+        "selector": "0x1d4490cb"
       },
       {
         "args": [
@@ -748,6 +774,15 @@
                             }
                           },
                           "name": "votes_against"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xc1582d1d",
+                              "ty": 2
+                            }
+                          },
+                          "name": "start_block"
                         }
                       ],
                       "name": "Vote"
@@ -1060,6 +1095,10 @@
               {
                 "index": 4,
                 "name": "TokenMintingFailed"
+              },
+              {
+                "index": 5,
+                "name": "VotingHasEnded"
               }
             ]
           }
@@ -1157,6 +1196,11 @@
                 "name": "votes_against",
                 "type": 18,
                 "typeName": "Option<u64>"
+              },
+              {
+                "name": "start_block",
+                "type": 2,
+                "typeName": "u32"
               }
             ]
           }

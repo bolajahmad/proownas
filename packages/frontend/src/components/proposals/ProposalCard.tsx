@@ -1,3 +1,6 @@
+import { useFetchProposal } from '@utils/hooks/useSingleProposal'
+import { Proposal } from '../../types/customs'
+import { truncateHash } from '@utils/truncateHash'
 import { useRouter } from 'next/router'
 import tw, { css } from 'twin.macro'
 
@@ -6,9 +9,12 @@ const cardCss = css`
  ;
 `
 
-export const ProposalCard: React.FC<any> = ({ status, ...proposal }) => {
+export const ProposalCard: React.FC<Proposal> = ({ status, ...proposal }) => {
   const router = useRouter()
-  console.log({ proposal, status })
+  const { proposalMetadata } = useFetchProposal(proposal.proposalId)
+
+  const timestamp = Number(proposal.createdAt.split(',').join(''))
+
   return (
     <div
       css={cardCss}
@@ -22,15 +28,15 @@ export const ProposalCard: React.FC<any> = ({ status, ...proposal }) => {
                 <span tw="uppercase">{proposal.proposalCid}</span>
               </div>
             </div>
-            <p tw="text-lg">
-              Proposal# by <strong>address</strong>
+            <p tw="text-sm">
+              Proposal by <strong>{truncateHash(proposal.proposer, 5)}</strong>
             </p>
           </div>
 
           <span tw="rounded-xl bg-slate-100 px-2 py-1 text-blue-700">{status}</span>
         </div>
-        <h2 tw="mt-5 font-bold">2 days ago</h2>
-        <p tw="text-slate-100">New proposal</p>
+        <h2 tw="mt-5 font-bold">{new Date(timestamp).toLocaleDateString()}</h2>
+        <p tw="text-slate-100">{proposalMetadata?.description}</p>
       </div>
     </div>
   )

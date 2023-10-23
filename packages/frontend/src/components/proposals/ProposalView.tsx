@@ -72,7 +72,9 @@ export const ProposalView = () => {
                   <ProposalCard key={proposal.id} {...proposal} />
                 ))
               ) : (
-                <p key={tab}>No {tab === 'All' ? '' : tab} Proposals</p>
+                <p key={tab} tw="font-semibold text-red-600 italic">
+                  No {tab === 'All' ? '' : tab} Proposals
+                </p>
               )}
             </Tab.Panel>
           )

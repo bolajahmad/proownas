@@ -7,6 +7,7 @@ import 'twin.macro'
 import { useProownasDAOContext } from '@context/ProownasDAO'
 import { useEffect } from 'react'
 import { ProposalVotingActionsView } from './ProposalVotingActionsView'
+import { truncateHash } from '@utils/truncateHash'
 
 export const ProposalById = ({ id }: { id: string }) => {
   const { fetchProposalById, selectedProposal } = useProownasDAOContext()!
@@ -20,7 +21,7 @@ export const ProposalById = ({ id }: { id: string }) => {
   return (
     <div tw="grid grid-cols-1 gap-10 md:grid-cols-2">
       <section tw="rounded-md bg-gray-900 p-3">
-        <h2 tw="font-bold text-3xl">Proposal of {selectedProposal?.proposer ?? '#'}</h2>
+        <h2 tw="font-bold text-2xl">Proposal of {truncateHash(selectedProposal?.proposer, 5)}</h2>
         <p tw="mt-6">{proposalMetadata?.description}</p>
 
         <div tw="mt-12">
@@ -64,7 +65,7 @@ export const ProposalById = ({ id }: { id: string }) => {
           <ul tw="flex w-full flex-col gap-2 text-lg">
             <li>
               <strong tw="text-gray-200">Proposed by:</strong>{' '}
-              <span>{selectedProposal?.proposer}</span>
+              <span>{truncateHash(selectedProposal?.proposer, 6)}</span>
             </li>
             <li>
               <strong tw="text-gray-200">Start block:</strong>{' '}
@@ -111,7 +112,7 @@ export const ProposalById = ({ id }: { id: string }) => {
                   </Td>
                   <Td>
                     <Link target="blank" href={`https://${file.cid}.ipfs.dweb.link/`}>
-                      <span tw="">{file.cid}</span>
+                      <span tw="">{truncateHash(file.cid, 10)}</span>
                     </Link>
                   </Td>
                   <Td isNumeric>{Math.round(file.size / 1000)}kb</Td>
