@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xa9098ab65681eae09e82279fe4ece1279e582aee39f98e1e39aaad093a11338f",
+    "hash": "0x0cd30b067d9e406d9d04ad7679a1059971c0b23b71e8bf1f7fc219643d0a16f0",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -74,13 +74,13 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 30
+        "type": 31
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 29
+        "type": 30
       },
       "maxEventTopics": 4,
       "timestamp": {
@@ -561,6 +561,32 @@
           "type": 28
         },
         "selector": "0x63929fbf"
+      },
+      {
+        "args": [
+          {
+            "label": "proposal_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 6
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "get_voting_period_remaining",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 29
+        },
+        "selector": "0x81344a58"
       }
     ]
   },
@@ -1634,6 +1660,48 @@
       "id": 29,
       "type": {
         "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 2
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 11
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 2
+          },
+          {
+            "name": "E",
+            "type": 11
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 30,
+      "type": {
+        "def": {
           "composite": {
             "fields": [
               {
@@ -1651,7 +1719,7 @@
       }
     },
     {
-      "id": 30,
+      "id": 31,
       "type": {
         "def": {
           "variant": {}

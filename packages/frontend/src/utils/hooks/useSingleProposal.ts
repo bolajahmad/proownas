@@ -11,7 +11,7 @@ import { use, useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useProownasDAOContext } from '@context/ProownasDAO'
 
-async function fetchMetadataByCID(cid: string) {
+export async function fetchMetadataByCID(cid: string) {
   try {
     const client = makeWeb3StorageClient()
     const response = await client.get(cid)
@@ -26,47 +26,46 @@ async function fetchMetadataByCID(cid: string) {
   }
 }
 
-export const useFetchProposal = (proposalId: string | number) => {
-  const { selectedProposal } = useProownasDAOContext()!
+export const useFetchProposal = (proposalId: string | number, proposalCid?: string) => {
   const [proposalMetadata, setMetadata] = useState<Record<string, any>>()
   const [proposalFiles, setFiles] = useState<any[]>([])
   const [isLoading, setLoading] = useState(false)
 
-  const fetchProposalIPFSData = useCallback(async () => {
-    setLoading(true)
-    try {
-      // fetch metadata from NFT Storage
-      const proposalCid = selectedProposal?.proposalCid
-
-      if (proposalCid) {
-        const proposalFiles = await fetchMetadataByCID(proposalCid)
-        if (proposalFiles) {
-          const reader = new FileReader()
-          reader.onload = (event) => {
-            if (event.target) {
-              try {
-                const jsonData = JSON.parse(event.target.result as string)
-                setMetadata({
-                  description: jsonData.description,
-                  filesCID: jsonData.filesCID,
-                  references: jsonData.references ? jsonData.references : undefined,
-                })
-              } catch (error) {
-                console.error(error)
+  const fetchProposalIPFSData = useCallback(
+    async (proposalCid?: string) => {
+      setLoading(true)
+      try {
+        if (proposalCid) {
+          const proposalFiles = await fetchMetadataByCID(proposalCid)
+          if (proposalFiles) {
+            const reader = new FileReader()
+            reader.onload = (event) => {
+              if (event.target) {
+                try {
+                  const jsonData = JSON.parse(event.target.result as string)
+                  setMetadata({
+                    description: jsonData.description,
+                    filesCID: jsonData.filesCID,
+                    references: jsonData.references ? jsonData.references : undefined,
+                  })
+                } catch (error) {
+                  console.error(error)
+                }
               }
             }
+            reader.readAsText(proposalFiles[0])
           }
-          reader.readAsText(proposalFiles[0])
         }
+      } catch (e) {
+        console.error(e)
+        toast.error('Error while fetching proposal count. Try again…')
+        return null
+      } finally {
+        setLoading(false)
       }
-    } catch (e) {
-      console.error(e)
-      toast.error('Error while fetching proposal count. Try again…')
-      return null
-    } finally {
-      setLoading(false)
-    }
-  }, [selectedProposal?.proposalCid])
+    },
+    [proposalCid],
+  )
 
   const fetchProposalFiles = useCallback(async () => {
     if (proposalMetadata) {
@@ -93,11 +92,13 @@ export const useFetchProposal = (proposalId: string | number) => {
   }, [fetchProposalFiles])
 
   useEffect(() => {
-    fetchProposalIPFSData()
-  }, [])
+    fetchProposalIPFSData(proposalCid as string)
+  }, [proposalCid])
 
   return {
     proposalMetadata,
+    fetchProposalIPFSData,
     proposalFiles,
+    isLoading,
   }
 }

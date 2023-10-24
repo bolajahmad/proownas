@@ -5,6 +5,7 @@ import tw from 'twin.macro'
 import { Button } from '@chakra-ui/react'
 import { useProownasDAOContext } from '@context/ProownasDAO'
 import { ProposalCard } from './ProposalCard'
+import { useDAOProposal } from '@utils/hooks/useDAOProposal'
 
 const TabStates = [
   ProposalStatus.Pending,
@@ -41,6 +42,7 @@ export const ProposalView = () => {
                   bg="transparent"
                   px={4}
                   py={2}
+                  key={tabIndex + tab}
                   borderBottom="2px solid transparent"
                   borderRadius="none"
                   color={selected ? 'blue.700' : 'white'}
@@ -63,10 +65,10 @@ export const ProposalView = () => {
         ))}
       </Tab.List>
       <Tab.Panels>
-        {['All', ...TabStates].map((tab) => {
+        {['All', ...TabStates].map((tab, index) => {
           const filteredProposals = proposals(tab as ProposalStatus | 'All')
           return (
-            <Tab.Panel key={tab} tw="grid grid-cols-2 gap-4">
+            <Tab.Panel key={tab + index} tw="grid grid-cols-2 gap-4">
               {filteredProposals && filteredProposals.length > 0 ? (
                 filteredProposals?.map((proposal) => (
                   <ProposalCard key={proposal.id} {...proposal} />

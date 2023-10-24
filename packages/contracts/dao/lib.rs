@@ -198,17 +198,11 @@ mod dao {
                 };
                 assert!(caller_proposals.len() > 0, "No proposals available");
 
-                let current_proposal = caller_proposals.iter().find(|p| **p == proposal_id);
+                let current_proposal = caller_proposals.iter().any(|p| *p == proposal_id);
 
-                if current_proposal.is_some() {
+                if current_proposal {
                     proposal.status = ProposalStatus::Ongoing;
                     self.proposal_by_id.insert(&proposal_id, &proposal);
-                    self.env().emit_event(ProposalUpdated {
-                        owner: caller,
-                        proposal_cid: proposal.proposal_cid,
-                        proposal_id,
-                        updated_at: self.env().block_number(),
-                    });
 
                     self.votes_by_proposal.insert(
                         &proposal_id,
@@ -219,6 +213,12 @@ mod dao {
                             start_block: self.env().block_number(),
                         },
                     );
+                    self.env().emit_event(ProposalUpdated {
+                        owner: caller,
+                        proposal_cid: proposal.proposal_cid,
+                        proposal_id,
+                        updated_at: self.env().block_number(),
+                    });
                 }
 
                 Ok(())
@@ -236,8 +236,9 @@ mod dao {
                 ProposalStatus::Ongoing => true,
                 _ => false,
             };
+            let vote_stats = self.votes_by_proposal.get(&proposal_id).unwrap();
             assert!(
-                is_ongoing && (proposal.start_block + proposal.duration <= block_number),
+                is_ongoing && (vote_stats.start_block + proposal.duration > block_number),
                 "ClosedProposal"
             );
 
@@ -302,16 +303,16 @@ mod dao {
                 Ok(mut proposal) => match proposal.status {
                     ProposalStatus::Ongoing => {
                         let mut vote = self.votes_by_proposal.get(&proposal_id).unwrap();
-                        let passed_blocks = vote.start_block + proposal.duration;
+                        let vote_end_block = vote.start_block + proposal.duration;
                         assert!(
-                            passed_blocks > self.env().block_number(),
-                            "CannotStopVoting"
+                            vote_end_block < self.env().block_number(),
+                            "CannotCloseVoting"
                         );
 
                         // // calculate vote ratio
                         // // for approval, expect a VoteType::Yes greater than 60%% vote
                         // // for rejection: if total vote < 4
-                        let voters_count = (vote.voters.len() as u64).checked_mul(100).unwrap();
+                        let voters_count = (vote.voters.len() as u64);
                         // assert!(vote.voters.len() > 4, "NotEnoughVotes");
                         let (votes_for, votes_against): (u64, u64) = (
                             match vote.votes_for {
@@ -325,7 +326,7 @@ mod dao {
                         );
                         let percentage = (votes_for.checked_mul(10000))
                             .unwrap()
-                            .checked_div(voters_count)
+                            .checked_div(voters_count.checked_mul(100).unwrap())
                             .unwrap();
                         if percentage < 65 || voters_count < 5 {
                             proposal.status = ProposalStatus::Rejected;
@@ -418,6 +419,20 @@ mod dao {
         #[ink(message)]
         pub fn get_proposal_count(&self) -> u128 {
             self.proposal_count
+        }
+
+        #[ink(message)]
+        pub fn get_voting_period_remaining(&self, proposal_id: u128) -> u32 {
+            let blocknumber = self.env().block_number();
+            let proposal = self.proposal_by_id.get(&proposal_id).unwrap();
+            self.votes_by_proposal.get(&proposal_id).map_or(0, |v| {
+                let block_spanned = blocknumber - v.start_block;
+                if block_spanned > proposal.duration {
+                    0
+                } else {
+                    proposal.duration - block_spanned
+                }
+            })
         }
     }
     // #[cfg(test)]
