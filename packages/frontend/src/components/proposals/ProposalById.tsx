@@ -62,10 +62,6 @@ export const ProposalById = ({ id }: { id: string }) => {
 
   console.log({ selectedProposal, proposalMetadata, proposalFiles })
 
-  // if (isFetching) {
-  //   return <Skeleton h={20} />
-  // }
-
   return (
     <div tw="grid grid-cols-1 gap-10 md:grid-cols-2">
       <section tw="rounded-md bg-gray-900 p-3">

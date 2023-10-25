@@ -20,7 +20,7 @@ export const getDeployments = async (): Promise<SubstrateDeployment[]> => {
         contractId: ContractIds.PropertyToken,
         networkId: network,
         abi: await import(`@inkathon/contracts/deployments/propertytoken/metadata.json`),
-        address: 'YAEtNFRedZUHHKJQj9Qp5Qu88E9hGugGXUtKPTcYdKwAweL',
+        address: 'ZhnTPEn5BuMa8u7sgGnwLHBVeWtibrZmSGLE64HtbNtMNDs',
       },
     ])
     .reduce(async (acc, curr) => [...(await acc), ...(await curr)], [] as any)
