@@ -4,7 +4,7 @@
 mod dao {
     use ink::env::call::{build_call, ExecutionInput, Selector};
     use ink::env::DefaultEnvironment;
-    use ink::prelude::vec::Vec;
+    use ink::prelude::{string::String, vec::Vec};
     use ink::storage::traits::StorageLayout;
     use ink::storage::Mapping;
     use scale::{Decode, Encode};
@@ -37,6 +37,7 @@ mod dao {
         ProposalNotFound,
         AsserExists,
         TokenMintingFailed,
+        VotingHasEnded,
     }
 
     #[derive(Encode, Decode)]
@@ -87,6 +88,7 @@ mod dao {
         voters: Vec<AccountId>,
         votes_for: Option<u64>,
         votes_against: Option<u64>,
+        start_block: u32,
     }
     #[ink(storage)]
     pub struct DAO {
@@ -196,17 +198,11 @@ mod dao {
                 };
                 assert!(caller_proposals.len() > 0, "No proposals available");
 
-                let current_proposal = caller_proposals.iter().find(|p| **p == proposal_id);
+                let current_proposal = caller_proposals.iter().any(|p| *p == proposal_id);
 
-                if current_proposal.is_some() {
+                if current_proposal {
                     proposal.status = ProposalStatus::Ongoing;
                     self.proposal_by_id.insert(&proposal_id, &proposal);
-                    self.env().emit_event(ProposalUpdated {
-                        owner: caller,
-                        proposal_cid: proposal.proposal_cid,
-                        proposal_id,
-                        updated_at: self.env().block_number(),
-                    });
 
                     self.votes_by_proposal.insert(
                         &proposal_id,
@@ -214,8 +210,15 @@ mod dao {
                             voters: Vec::new(),
                             votes_for: Some(0),
                             votes_against: Some(0),
+                            start_block: self.env().block_number(),
                         },
                     );
+                    self.env().emit_event(ProposalUpdated {
+                        owner: caller,
+                        proposal_cid: proposal.proposal_cid,
+                        proposal_id,
+                        updated_at: self.env().block_number(),
+                    });
                 }
 
                 Ok(())
@@ -233,10 +236,17 @@ mod dao {
                 ProposalStatus::Ongoing => true,
                 _ => false,
             };
+            let vote_stats = self.votes_by_proposal.get(&proposal_id).unwrap();
             assert!(
-                is_ongoing && (proposal.start_block + proposal.duration <= block_number),
+                is_ongoing && (vote_stats.start_block + proposal.duration > block_number),
                 "ClosedProposal"
             );
+
+            let caller_proposals = match self.proposals_by_account.get(&caller) {
+                Some(ps) => ps,
+                None => Vec::new(),
+            };
+            assert!(caller_proposals.len() > 0, "Not a member");
 
             let mut existing_vote = self.votes_by_proposal.get(&proposal_id).unwrap();
             let is_existing_user = existing_vote.voters.iter().any(|v| *v == caller);
@@ -253,6 +263,7 @@ mod dao {
                         voters: existing_vote.voters,
                         votes_for: Some(votes_for),
                         votes_against: Some(existing_vote.votes_against.unwrap()),
+                        start_block: existing_vote.start_block,
                     };
                     new_vote
                 }
@@ -265,6 +276,7 @@ mod dao {
                         voters: existing_vote.voters,
                         votes_for: Some(existing_vote.votes_for.unwrap()),
                         votes_against: Some(votes_against),
+                        start_block: existing_vote.start_block,
                     };
                     new_vote
                 }
@@ -285,6 +297,56 @@ mod dao {
         }
 
         #[ink(message)]
+        pub fn close_voting_period(&mut self, proposal_id: u128) -> Result<()> {
+            let p = self.get_proposal_by_id(proposal_id);
+            match p {
+                Ok(mut proposal) => match proposal.status {
+                    ProposalStatus::Ongoing => {
+                        let mut vote = self.votes_by_proposal.get(&proposal_id).unwrap();
+                        let vote_end_block = vote.start_block + proposal.duration;
+                        assert!(
+                            vote_end_block < self.env().block_number(),
+                            "CannotCloseVoting"
+                        );
+
+                        // // calculate vote ratio
+                        // // for approval, expect a VoteType::Yes greater than 60%% vote
+                        // // for rejection: if total vote < 4
+                        let voters_count = (vote.voters.len() as u64);
+                        // assert!(vote.voters.len() > 4, "NotEnoughVotes");
+                        let (votes_for, votes_against): (u64, u64) = (
+                            match vote.votes_for {
+                                Some(value) => value,
+                                None => 0,
+                            },
+                            match vote.votes_against {
+                                Some(value) => value,
+                                None => 0,
+                            },
+                        );
+                        let percentage = (votes_for.checked_mul(10000))
+                            .unwrap()
+                            .checked_div(voters_count.checked_mul(100).unwrap())
+                            .unwrap();
+                        if percentage < 65 || voters_count < 5 {
+                            proposal.status = ProposalStatus::Rejected;
+                        } else {
+                            proposal.status = ProposalStatus::Approved;
+                        }
+                        self.proposal_by_id.insert(&proposal_id, &proposal);
+                        Ok(())
+                    }
+                    _ => {
+                        return Err(Error::VotingHasEnded);
+                    }
+                },
+                _ => {
+                    return Err(Error::ProposalNotFound);
+                }
+            }
+        }
+
+        #[ink(message)]
         pub fn create_proposal_asset(&mut self, proposal_id: u128, owner: AccountId) -> Result<()> {
             let proposals_owned = self.proposals_by_account.get(&owner).unwrap();
             let proposal_exists = proposals_owned.iter().any(|p| *p == proposal_id);
@@ -297,21 +359,21 @@ mod dao {
             };
             assert!(is_approved_proposal, "Proposal must be approved");
 
-            // let mint_result = build_call::<DefaultEnvironment>()
-            //     .call(self.token_contract)
-            //     .gas_limit(0)
-            //     .exec_input(
-            //         ExecutionInput::new(Selector::new(ink::selector_bytes!("mint_property")))
-            //             .push_arg(&owner)
-            //             .push_arg(&current_proposal.proposal_cid),
-            //     )
-            //     .returns::<()>()
-            //     .try_invoke();
+            let mint_result = build_call::<DefaultEnvironment>()
+                .call(self.token_contract)
+                .gas_limit(0)
+                .exec_input(
+                    ExecutionInput::new(Selector::new(ink::selector_bytes!("mint_property")))
+                        .push_arg(&owner)
+                        .push_arg(&current_proposal.proposal_cid),
+                )
+                .returns::<()>()
+                .try_invoke();
 
-            // match mint_result {
-            //     Ok(Ok(_)) => Ok(()),
-            //     _ => Err(Error::TokenMintingFailed),
-            // }
+            match mint_result {
+                Ok(Ok(_)) => Ok(()),
+                _ => Err(Error::TokenMintingFailed),
+            };
             Ok(())
         }
 
@@ -357,6 +419,20 @@ mod dao {
         #[ink(message)]
         pub fn get_proposal_count(&self) -> u128 {
             self.proposal_count
+        }
+
+        #[ink(message)]
+        pub fn get_voting_period_remaining(&self, proposal_id: u128) -> u32 {
+            let blocknumber = self.env().block_number();
+            let proposal = self.proposal_by_id.get(&proposal_id).unwrap();
+            self.votes_by_proposal.get(&proposal_id).map_or(0, |v| {
+                let block_spanned = blocknumber - v.start_block;
+                if block_spanned > proposal.duration {
+                    0
+                } else {
+                    proposal.duration - block_spanned
+                }
+            })
         }
     }
     // #[cfg(test)]

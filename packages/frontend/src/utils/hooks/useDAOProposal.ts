@@ -42,7 +42,6 @@ export const useDAOProposal = () => {
 
   const fetchProposals = async () => {
     const proposalCount = await fetchProposalCount()
-    console.log({ proposalCount })
     if (Number(proposalCount)) {
       const proposals = new Array(proposalCount)
       for (let i = 1; i <= proposalCount; i++) {

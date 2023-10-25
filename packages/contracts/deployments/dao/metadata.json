@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x5cb96c4b9c16ff1322ae228a4c353d0f2b340e155b99ef0a91f2124197aaedf2",
+    "hash": "0x0cd30b067d9e406d9d04ad7679a1059971c0b23b71e8bf1f7fc219643d0a16f0",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -74,13 +74,13 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 30
+        "type": 31
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 29
+        "type": 30
       },
       "maxEventTopics": 4,
       "timestamp": {
@@ -340,6 +340,32 @@
               ],
               "type": 6
             }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "close_voting_period",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 12
+        },
+        "selector": "0x1d4490cb"
+      },
+      {
+        "args": [
+          {
+            "label": "proposal_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 6
+            }
           },
           {
             "label": "owner",
@@ -535,6 +561,32 @@
           "type": 28
         },
         "selector": "0x63929fbf"
+      },
+      {
+        "args": [
+          {
+            "label": "proposal_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 6
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "get_voting_period_remaining",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 29
+        },
+        "selector": "0x81344a58"
       }
     ]
   },
@@ -748,6 +800,15 @@
                             }
                           },
                           "name": "votes_against"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xc1582d1d",
+                              "ty": 2
+                            }
+                          },
+                          "name": "start_block"
                         }
                       ],
                       "name": "Vote"
@@ -1060,6 +1121,10 @@
               {
                 "index": 4,
                 "name": "TokenMintingFailed"
+              },
+              {
+                "index": 5,
+                "name": "VotingHasEnded"
               }
             ]
           }
@@ -1157,6 +1222,11 @@
                 "name": "votes_against",
                 "type": 18,
                 "typeName": "Option<u64>"
+              },
+              {
+                "name": "start_block",
+                "type": 2,
+                "typeName": "u32"
               }
             ]
           }
@@ -1590,6 +1660,48 @@
       "id": 29,
       "type": {
         "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 2
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 11
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 2
+          },
+          {
+            "name": "E",
+            "type": 11
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 30,
+      "type": {
+        "def": {
           "composite": {
             "fields": [
               {
@@ -1607,7 +1719,7 @@
       }
     },
     {
-      "id": 30,
+      "id": 31,
       "type": {
         "def": {
           "variant": {}

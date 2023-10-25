@@ -5,9 +5,10 @@ import {
   useInkathon,
   useRegisteredContract,
 } from '@scio-labs/use-inkathon'
-import { VoteType } from '../../types/customs'
+import { Vote, VoteType } from '../../types/customs'
 import { contractTxWithToast } from '@utils/contractTxWithToast'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 export const useVoteOnProposal = () => {
   const [isSubmitting, setSubmitting] = useState(false)

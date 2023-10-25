@@ -8,7 +8,7 @@ export enum ProposalStatus {
 export interface Proposal {
   status: ProposalStatus
   startBlock: number
-  timestamp: number
+  createdAt: string
   proposer: string
   duration: number
   proposalCid: string
@@ -18,4 +18,10 @@ export interface Proposal {
 export enum VoteType {
   Yes = 'Yes',
   No = 'No',
+}
+
+export interface Vote {
+  voters: string[]
+  votesFor?: number
+  votesAgainst?: number
 }

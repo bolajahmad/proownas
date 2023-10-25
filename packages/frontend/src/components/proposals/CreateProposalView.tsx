@@ -65,7 +65,7 @@ const ProposalDetailForm = ({
   onCancel?: () => void
   onComplete: (values?: any) => void
 }) => {
-  const { createProposal } = useWriteProposal()
+  const { createProposal, isSubmitting } = useWriteProposal()
   const { handleSubmit, register, watch, setValue } = useForm({
     reValidateMode: 'onBlur',
   })
@@ -171,7 +171,11 @@ const ProposalDetailForm = ({
           Cancel
         </Button>
 
-        <Button type="submit" tw="bg-blue-500 text-white hover:bg-blue-700">
+        <Button
+          type="submit"
+          isLoading={isSubmitting}
+          tw="bg-blue-500 text-white hover:bg-blue-700"
+        >
           Submit
         </Button>
       </div>
