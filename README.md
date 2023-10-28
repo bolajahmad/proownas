@@ -50,7 +50,7 @@ By [Bolaji Ahmad](https://linkedin.com/in/bolajahmad) 🪄
 
 ## Setup and Installation 🚨
 
-This repository contains code for the Proownas DAO Decentralized application. More information about the DAO can be found in (the DAO doc)[./packages/contracts/README.md].
+This repository contains code for the Proownas DAO Decentralized application. More information about the DAO can be found in (the DAO doc)[packages/contracts/README.md].
 
 There are 2 applications in the `./packages` folder namely: `contracts` and `frontend`.
 
@@ -75,7 +75,7 @@ Assuming you have NodeJS installed, Installed pnpm also (the project is managed 
 
 ```
 
-To run the frontend successfully, be sure to update the `NEXT_PUBLIC_WEB3STORAGE_TOKEN` with a token of your choice (or contact (bjahmad4tech@gmail.com)[mailto:bjahmad4tech@gmail.com])
+To run the frontend successfully, be sure to update the `NEXT_PUBLIC_WEB3STORAGE_TOKEN` with a token of your choice, or contact (bjahmad4tech@gmail.com)[mailto:bjahmad4tech@gmail.com]
 
 
 ### Running the contract
