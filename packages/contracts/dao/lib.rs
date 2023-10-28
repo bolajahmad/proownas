@@ -3,9 +3,8 @@
 #[ink::contract]
 mod dao {
     use ink::env::call::{build_call, ExecutionInput, Selector};
-    use ink::env::{caller, DefaultEnvironment};
-    use ink::prelude::{string::String, vec::Vec};
-    use ink::primitives::AccountId;
+    use ink::env::DefaultEnvironment;
+    use ink::prelude::vec::Vec;
     use ink::storage::traits::StorageLayout;
     use ink::storage::Mapping;
     use scale::{Decode, Encode};
@@ -155,33 +154,42 @@ mod dao {
         /// The address of the PSP34 contract that is
         /// responsible for minting and burning new assets
         token_contract: AccountId,
+        /// A toggle to decide if the contract has default contracts
+        has_set_default_assets: bool,
     }
 
     impl DAO {
         /// The constructor of the contract.
         /// supply initial asset to the DAO
         #[ink(constructor)]
-        pub fn new(token_contract: AccountId, initial_assets: Vec<ContentIdentifier>) -> Self {
-            let mut assets_owned = Vec::new();
-            let caller = Self::env().caller();
-
-            /// set the token_contract storage first,
-            /// so that the mint messsage can access it
-            self.set_token_contract(token_contract);
-
-            // for each asset, mint a new token
-            for asset in initial_assets {
-                Self::execute_mint_message(caller, asset);
-            }
-
+        pub fn new(token_contract: AccountId) -> Self {
             Self {
                 proposal_by_id: Mapping::new(),
                 users: Vec::new(),
                 proposals_by_account: Mapping::new(),
                 proposal_count: 0,
                 votes_by_proposal: Mapping::new(),
-                token_contract: AccountId::from([0x00; 32]),
+                token_contract,
+                has_set_default_assets: false,
             }
+        }
+
+        #[ink(message)]
+        pub fn set_default_assets(&mut self, initial_assets: Vec<ContentIdentifier>) -> Result<()> {
+            assert!(self.token_contract != AccountId::from([0x0; 32]));
+            let mut to_return: Result<()> = Ok(());
+            for asset in initial_assets {
+                let mut result = self.execute_mint_message(self.env().caller(), asset);
+                to_return = match result {
+                    true => {
+                        self.has_set_default_assets = true;
+                        Ok(())
+                    }
+                    false => Err(Error::TokenMintingFailed),
+                };
+            }
+
+            to_return
         }
 
         /* Submit a new proposal to the DAO
@@ -197,12 +205,13 @@ mod dao {
             created_at: u64,
             days: u32,
         ) -> Result<()> {
+            assert!(self.has_set_default_assets, "Must have set owner's assets");
             self.ensure_valid_cid(&proposal_cid);
-            self.ensure_new_cid(&proposal_cid);
+            self.ensure_new_cid(&proposal_cid)?;
             let caller = self.env().caller();
 
             // fetch the proposal count
-            let mut proposal_count = self.proposal_count.checked_add(1).unwrap();
+            let proposal_count = self.proposal_count.checked_add(1).unwrap();
             // fetch the proposals of caller
             let mut proposals_of = self.proposals_by_account.get(&caller).unwrap_or(Vec::new());
             proposals_of.push(proposal_count);
@@ -224,9 +233,9 @@ mod dao {
 
             self.proposal_count = proposal_count;
             self.proposal_by_id.insert(&proposal_count, &proposal);
-            let is_existing = self.users.iter().any(|a| *a == owner);
+            let is_existing = self.users.iter().any(|a| *a == caller);
             if !is_existing {
-                self.users.push(owner);
+                self.users.push(caller);
             };
 
             self.env().emit_event(ProposalUpdated {
@@ -285,7 +294,6 @@ mod dao {
         pub fn vote_on_proposal(&mut self, proposal_id: u128, vote: VoteType) -> Result<()> {
             let caller = self.env().caller();
             let block_number = self.env().block_number();
-            let caller_proposals = self.ensure_is_member(&caller);
             let proposal = self.proposal_by_id.get(&proposal_id).unwrap();
 
             let is_ongoing = match proposal.status {
@@ -352,7 +360,7 @@ mod dao {
             match p {
                 Ok(mut proposal) => match proposal.status {
                     ProposalStatus::Ongoing => {
-                        let mut vote = self.votes_by_proposal.get(&proposal_id).unwrap();
+                        let vote = self.votes_by_proposal.get(&proposal_id).unwrap();
                         let vote_end_block = vote.start_block + proposal.duration;
                         assert!(
                             vote_end_block < self.env().block_number(),
@@ -364,7 +372,7 @@ mod dao {
                         // // for rejection: if total vote < 4
                         let voters_count = vote.voters.len() as u64;
                         assert!(voters_count > 3, "NotEnoughVotes");
-                        let (votes_for, votes_against): (u64, u64) = (
+                        let (votes_for, _): (u64, u64) = (
                             match vote.votes_for {
                                 Some(value) => value,
                                 None => 0,
@@ -409,39 +417,38 @@ mod dao {
             };
             assert!(is_approved_proposal, "Proposal must be approved");
 
-            self.execute_mint_message(owner, current_proposal.proposal_id);
-            Ok(())
+            let result = self.execute_mint_message(owner, current_proposal.proposal_cid);
+            match result {
+                true => Ok(()),
+                false => Err(Error::TokenMintingFailed),
+            }
         }
 
         #[ink(message)]
-        pub fn destroy_asset(
-            &mut self,
-            asset_cid: ContentIdentifier,
-            owner: AccountId,
-        ) -> Result<()> {
-            let pos = self.assets_owned.iter().position(|a| *a == asset_cid);
+        pub fn destroy_asset(&mut self, asset_cid: ContentIdentifier) -> Result<()> {
+            let account_id = self.ensure_new_cid(&asset_cid);
 
-            if pos.is_some() {
-                let burn_result = build_call::<DefaultEnvironment>()
-                    .call(self.token_contract)
-                    .gas_limit(0)
-                    .exec_input(
-                        ExecutionInput::new(Selector::new(ink::selector_bytes!("burn_property")))
-                            .push_arg(&owner)
+            match account_id {
+                Ok(account) => {
+                    let burn_result = build_call::<DefaultEnvironment>()
+                        .call(self.token_contract)
+                        .gas_limit(0)
+                        .exec_input(
+                            ExecutionInput::new(Selector::new(ink::selector_bytes!(
+                                "burn_property"
+                            )))
+                            .push_arg(&account)
                             .push_arg(&asset_cid),
-                    )
-                    .returns::<()>()
-                    .try_invoke();
+                        )
+                        .returns::<()>()
+                        .try_invoke();
 
-                match burn_result {
-                    Ok(Ok(_)) => {
-                        self.assets_owned.swap_remove(pos.unwrap());
-                        Ok(())
+                    match burn_result {
+                        Ok(Ok(_)) => Ok(()),
+                        _ => Err(Error::TokenBurningFailed),
                     }
-                    _ => Err(Error::TokenBurningFailed),
                 }
-            } else {
-                return Err(Error::TokenBurningFailed);
+                _ => Err(Error::TokenBurningFailed),
             }
         }
 
@@ -506,8 +513,9 @@ mod dao {
 
         #[ink(message)]
         pub fn get_all_users(&self) -> (Vec<AccountId>, u32) {
-            let all_users = self.users;
-            (all_users, all_users.len() as u32)
+            let all_users = &self.users;
+            let length = all_users.len() as u32;
+            (all_users.clone(), length)
         }
 
         pub fn ensure_valid_cid(&self, cid: &ContentIdentifier) {
@@ -517,10 +525,21 @@ mod dao {
         /// Called to verify that the proposal_cid submitted is a new proposal
         /// It is sufficient to check the assets_pwned mapping
         /// @param proposal_cid: IPFS CID of the propposal
-        pub fn ensure_new_cid(&self, proposal_cid: &ContentIdentifier) {
-            let is_existing = self.assets_owned.iter().any(|a| a == proposal_cid);
-            // proposal_cid must be existent, need to update the proposal in that case.
-            assert!(!is_existing, "Proposal exists")
+        pub fn ensure_new_cid(&self, proposal_cid: &ContentIdentifier) -> Result<AccountId> {
+            let result = build_call::<DefaultEnvironment>()
+                .call(self.token_contract)
+                .gas_limit(0)
+                .exec_input(
+                    ExecutionInput::new(Selector::new(ink::selector_bytes!("psp34::owner_of")))
+                        .push_arg(&proposal_cid),
+                )
+                .returns::<AccountId>()
+                .try_invoke();
+
+            match result {
+                Ok(Ok(account)) => Ok(account),
+                _ => Err(Error::InvalidAsset),
+            }
         }
 
         pub fn ensure_is_member(&self, account: &AccountId) -> Vec<u128> {
@@ -540,9 +559,10 @@ mod dao {
         }
 
         pub fn execute_mint_message(
+            &self,
             owner: AccountId,
             proposal_cid: ContentIdentifier,
-        ) -> Result<()> {
+        ) -> bool {
             let mint_result = build_call::<DefaultEnvironment>()
                 .call(self.token_contract)
                 .gas_limit(0)
@@ -555,8 +575,8 @@ mod dao {
                 .try_invoke();
 
             match mint_result {
-                Ok(Ok(_)) => Ok(()),
-                _ => Err(Error::TokenMintingFailed),
+                Ok(Ok(_)) => true,
+                _ => false,
             }
         }
     }

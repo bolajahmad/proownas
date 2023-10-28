@@ -378,15 +378,6 @@ mod multisig {
             result
         }
 
-        #[ink(message)]
-        pub fn encode_function_name(&self) -> [u8; 4] {
-            let selector: [u8; 4] = <Self as Encode>::using_encoded(|e| {
-                e.push(b"add_owner");
-                e.push(&AccountId::from([00; 32])); // Argument type (example: default AccountId)
-            });
-            selector
-        }
-
         /// Get the index of `owner` in `self.owners`.
         /// Panics if `owner` is not found in `self.owners`.
         fn owner_index(&self, owner: &AccountId) -> u32 {

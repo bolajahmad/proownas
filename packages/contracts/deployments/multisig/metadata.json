@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xa6cea438050babf44956fbcc84ecc8dbf66e21d67b1d2a5a1f98f266fb2d0ae9",
+    "hash": "0x4caf61002b10b14a673eb23340e9f21da31a902648f089b3a4504e76996e282f",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -81,13 +81,13 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 30
+        "type": 29
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 29
+        "type": 28
       },
       "maxEventTopics": 4,
       "timestamp": {
@@ -249,7 +249,7 @@
               "displayName": [
                 "Result"
               ],
-              "type": 27
+              "type": 26
             }
           }
         ],
@@ -627,22 +627,6 @@
           "type": 24
         },
         "selector": "0xda9878fb"
-      },
-      {
-        "args": [],
-        "default": false,
-        "docs": [],
-        "label": "encode_function_name",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 26
-        },
-        "selector": "0x6bb05de3"
       }
     ]
   },
@@ -1424,49 +1408,7 @@
               {
                 "fields": [
                   {
-                    "type": 5
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 12
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 5
-          },
-          {
-            "name": "E",
-            "type": 12
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 27,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 28
+                    "type": 27
                   }
                 ],
                 "index": 0,
@@ -1487,7 +1429,7 @@
         "params": [
           {
             "name": "T",
-            "type": 28
+            "type": 27
           },
           {
             "name": "E",
@@ -1500,7 +1442,7 @@
       }
     },
     {
-      "id": 28,
+      "id": 27,
       "type": {
         "def": {
           "variant": {
@@ -1533,7 +1475,7 @@
       }
     },
     {
-      "id": 29,
+      "id": 28,
       "type": {
         "def": {
           "composite": {
@@ -1553,7 +1495,7 @@
       }
     },
     {
-      "id": 30,
+      "id": 29,
       "type": {
         "def": {
           "variant": {}

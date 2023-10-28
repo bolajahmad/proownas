@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xced0cec261f9ea0e6ab0808faadc53f680d5a6fee9fd987a0a3fa276e09f9ba2",
+    "hash": "0x1a8da05b93640a251034f96ceb5a1d064e4114c2461ad63f63670425d1216426",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -25,12 +25,12 @@
       {
         "args": [
           {
-            "label": "initial_asset",
+            "label": "token_contract",
             "type": {
               "displayName": [
-                "ContentIdentifier"
+                "AccountId"
               ],
-              "type": 5
+              "type": 1
             }
           }
         ],
@@ -75,13 +75,13 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 32
+        "type": 34
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 31
+        "type": 33
       },
       "maxEventTopics": 4,
       "timestamp": {
@@ -95,7 +95,9 @@
       {
         "args": [
           {
-            "docs": [],
+            "docs": [
+              " The address of the proposal owner"
+            ],
             "indexed": true,
             "label": "owner",
             "type": {
@@ -106,7 +108,9 @@
             }
           },
           {
-            "docs": [],
+            "docs": [
+              " The proposal CID of the proposal"
+            ],
             "indexed": false,
             "label": "proposal_cid",
             "type": {
@@ -117,7 +121,9 @@
             }
           },
           {
-            "docs": [],
+            "docs": [
+              " The blocknumber where proposal was updated"
+            ],
             "indexed": false,
             "label": "updated_at",
             "type": {
@@ -128,7 +134,9 @@
             }
           },
           {
-            "docs": [],
+            "docs": [
+              " The ID of the proposal that was updated"
+            ],
             "indexed": false,
             "label": "proposal_id",
             "type": {
@@ -139,13 +147,17 @@
             }
           }
         ],
-        "docs": [],
+        "docs": [
+          "Emitted when proposal is created/updated"
+        ],
         "label": "ProposalUpdated"
       },
       {
         "args": [
           {
-            "docs": [],
+            "docs": [
+              " Vote address of the new voter"
+            ],
             "indexed": true,
             "label": "voter",
             "type": {
@@ -156,7 +168,9 @@
             }
           },
           {
-            "docs": [],
+            "docs": [
+              " The blocknumber where vote was cast"
+            ],
             "indexed": false,
             "label": "updated_at",
             "type": {
@@ -167,18 +181,22 @@
             }
           },
           {
-            "docs": [],
+            "docs": [
+              " The voted decision: VoteType::Yes or VoteType::No"
+            ],
             "indexed": false,
             "label": "vote",
             "type": {
               "displayName": [
                 "VoteType"
               ],
-              "type": 16
+              "type": 17
             }
           },
           {
-            "docs": [],
+            "docs": [
+              " The ID of the proposal that was voted on"
+            ],
             "indexed": false,
             "label": "proposal_id",
             "type": {
@@ -189,7 +207,9 @@
             }
           },
           {
-            "docs": [],
+            "docs": [
+              " The total number of votes for the proposal, after cast"
+            ],
             "indexed": false,
             "label": "votes_for",
             "type": {
@@ -200,7 +220,9 @@
             }
           },
           {
-            "docs": [],
+            "docs": [
+              " The total number of votes against the proposal, after cast"
+            ],
             "indexed": false,
             "label": "votes_against",
             "type": {
@@ -211,7 +233,9 @@
             }
           }
         ],
-        "docs": [],
+        "docs": [
+          "Emitted when a vote is casted"
+        ],
         "label": "VoteUpdated"
       }
     ],
@@ -223,6 +247,32 @@
       "type": 12
     },
     "messages": [
+      {
+        "args": [
+          {
+            "label": "initial_assets",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 13
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "set_default_assets",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 14
+        },
+        "selector": "0x7298d592"
+      },
       {
         "args": [
           {
@@ -255,7 +305,7 @@
         ],
         "default": false,
         "docs": [],
-        "label": "submit_new_asset",
+        "label": "submit_new_proposal",
         "mutates": true,
         "payable": false,
         "returnType": {
@@ -263,9 +313,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 13
+          "type": 14
         },
-        "selector": "0xa0d9ec9a"
+        "selector": "0xa9b6109b"
       },
       {
         "args": [
@@ -292,7 +342,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 13
+          "type": 14
         },
         "selector": "0xd68f9f61"
       },
@@ -313,7 +363,7 @@
               "displayName": [
                 "VoteType"
               ],
-              "type": 16
+              "type": 17
             }
           }
         ],
@@ -327,7 +377,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 13
+          "type": 14
         },
         "selector": "0xa7072938"
       },
@@ -353,7 +403,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 13
+          "type": 14
         },
         "selector": "0x1d4490cb"
       },
@@ -388,7 +438,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 13
+          "type": 14
         },
         "selector": "0xae1a18d9"
       },
@@ -402,15 +452,6 @@
               ],
               "type": 5
             }
-          },
-          {
-            "label": "owner",
-            "type": {
-              "displayName": [
-                "AccountId"
-              ],
-              "type": 1
-            }
           }
         ],
         "default": false,
@@ -423,25 +464,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 13
+          "type": 14
         },
         "selector": "0x7515848e"
-      },
-      {
-        "args": [],
-        "default": false,
-        "docs": [],
-        "label": "get_total_assets_count",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 17
-        },
-        "selector": "0xc8697bdc"
       },
       {
         "args": [
@@ -542,7 +567,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 23
+          "type": 22
         },
         "selector": "0xad4a397f"
       },
@@ -568,7 +593,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 24
+          "type": 23
         },
         "selector": "0x9d880359"
       },
@@ -594,7 +619,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 28
+          "type": 27
         },
         "selector": "0x9575936f"
       },
@@ -610,7 +635,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 17
+          "type": 29
         },
         "selector": "0x63929fbf"
       },
@@ -639,6 +664,22 @@
           "type": 30
         },
         "selector": "0x81344a58"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "get_all_users",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 31
+        },
+        "selector": "0x72ee46c2"
       }
     ]
   },
@@ -747,6 +788,15 @@
               "layout": {
                 "leaf": {
                   "key": "0x00000000",
+                  "ty": 6
+                }
+              },
+              "name": "proposal_count"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
                   "ty": 7
                 }
               },
@@ -765,15 +815,6 @@
                 }
               },
               "name": "proposals_by_account"
-            },
-            {
-              "layout": {
-                "leaf": {
-                  "key": "0x00000000",
-                  "ty": 6
-                }
-              },
-              "name": "proposal_count"
             },
             {
               "layout": {
@@ -870,19 +911,19 @@
               "layout": {
                 "leaf": {
                   "key": "0x00000000",
-                  "ty": 9
+                  "ty": 1
                 }
               },
-              "name": "assets_owned"
+              "name": "token_contract"
             },
             {
               "layout": {
                 "leaf": {
                   "key": "0x00000000",
-                  "ty": 1
+                  "ty": 9
                 }
               },
-              "name": "token_contract"
+              "name": "has_set_default_assets"
             }
           ],
           "name": "DAO"
@@ -989,9 +1030,7 @@
       "id": 9,
       "type": {
         "def": {
-          "sequence": {
-            "type": 5
-          }
+          "primitive": "bool"
         }
       }
     },
@@ -1068,12 +1107,22 @@
       "id": 13,
       "type": {
         "def": {
+          "sequence": {
+            "type": 5
+          }
+        }
+      }
+    },
+    {
+      "id": 14,
+      "type": {
+        "def": {
           "variant": {
             "variants": [
               {
                 "fields": [
                   {
-                    "type": 14
+                    "type": 15
                   }
                 ],
                 "index": 0,
@@ -1094,7 +1143,7 @@
         "params": [
           {
             "name": "T",
-            "type": 14
+            "type": 15
           },
           {
             "name": "E",
@@ -1107,7 +1156,7 @@
       }
     },
     {
-      "id": 14,
+      "id": 15,
       "type": {
         "def": {
           "variant": {
@@ -1124,7 +1173,7 @@
               {
                 "fields": [
                   {
-                    "type": 15
+                    "type": 16
                   }
                 ],
                 "index": 1,
@@ -1140,7 +1189,7 @@
           },
           {
             "name": "E",
-            "type": 15
+            "type": 16
           }
         ],
         "path": [
@@ -1149,7 +1198,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 16,
       "type": {
         "def": {
           "variant": {
@@ -1168,7 +1217,7 @@
               },
               {
                 "index": 3,
-                "name": "AsserExists"
+                "name": "AssetExists"
               },
               {
                 "index": 4,
@@ -1193,7 +1242,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 17,
       "type": {
         "def": {
           "variant": {
@@ -1213,48 +1262,6 @@
           "dao",
           "dao",
           "VoteType"
-        ]
-      }
-    },
-    {
-      "id": 17,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 6
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 12
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 6
-          },
-          {
-            "name": "E",
-            "type": 12
-          }
-        ],
-        "path": [
-          "Result"
         ]
       }
     },
@@ -1378,7 +1385,7 @@
               {
                 "fields": [
                   {
-                    "type": 22
+                    "type": 9
                   }
                 ],
                 "index": 0,
@@ -1399,7 +1406,7 @@
         "params": [
           {
             "name": "T",
-            "type": 22
+            "type": 9
           },
           {
             "name": "E",
@@ -1413,14 +1420,6 @@
     },
     {
       "id": 22,
-      "type": {
-        "def": {
-          "primitive": "bool"
-        }
-      }
-    },
-    {
-      "id": 23,
       "type": {
         "def": {
           "variant": {
@@ -1462,7 +1461,7 @@
       }
     },
     {
-      "id": 24,
+      "id": 23,
       "type": {
         "def": {
           "variant": {
@@ -1470,7 +1469,7 @@
               {
                 "fields": [
                   {
-                    "type": 25
+                    "type": 24
                   }
                 ],
                 "index": 0,
@@ -1491,7 +1490,7 @@
         "params": [
           {
             "name": "T",
-            "type": 25
+            "type": 24
           },
           {
             "name": "E",
@@ -1504,7 +1503,7 @@
       }
     },
     {
-      "id": 25,
+      "id": 24,
       "type": {
         "def": {
           "variant": {
@@ -1512,7 +1511,7 @@
               {
                 "fields": [
                   {
-                    "type": 26
+                    "type": 25
                   }
                 ],
                 "index": 0,
@@ -1521,7 +1520,7 @@
               {
                 "fields": [
                   {
-                    "type": 15
+                    "type": 16
                   }
                 ],
                 "index": 1,
@@ -1533,11 +1532,11 @@
         "params": [
           {
             "name": "T",
-            "type": 26
+            "type": 25
           },
           {
             "name": "E",
-            "type": 15
+            "type": 16
           }
         ],
         "path": [
@@ -1546,14 +1545,14 @@
       }
     },
     {
-      "id": 26,
+      "id": 25,
       "type": {
         "def": {
           "composite": {
             "fields": [
               {
                 "name": "status",
-                "type": 27,
+                "type": 26,
                 "typeName": "ProposalStatus"
               },
               {
@@ -1597,7 +1596,7 @@
       }
     },
     {
-      "id": 27,
+      "id": 26,
       "type": {
         "def": {
           "variant": {
@@ -1629,7 +1628,7 @@
       }
     },
     {
-      "id": 28,
+      "id": 27,
       "type": {
         "def": {
           "variant": {
@@ -1637,7 +1636,7 @@
               {
                 "fields": [
                   {
-                    "type": 29
+                    "type": 28
                   }
                 ],
                 "index": 0,
@@ -1658,7 +1657,7 @@
         "params": [
           {
             "name": "T",
-            "type": 29
+            "type": 28
           },
           {
             "name": "E",
@@ -1671,7 +1670,7 @@
       }
     },
     {
-      "id": 29,
+      "id": 28,
       "type": {
         "def": {
           "variant": {
@@ -1688,7 +1687,7 @@
               {
                 "fields": [
                   {
-                    "type": 15
+                    "type": 16
                   }
                 ],
                 "index": 1,
@@ -1704,7 +1703,49 @@
           },
           {
             "name": "E",
-            "type": 15
+            "type": 16
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 29,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 6
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 6
+          },
+          {
+            "name": "E",
+            "type": 12
           }
         ],
         "path": [
@@ -1758,6 +1799,59 @@
       "id": 31,
       "type": {
         "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 32
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 32
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 32,
+      "type": {
+        "def": {
+          "tuple": [
+            7,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "id": 33,
+      "type": {
+        "def": {
           "composite": {
             "fields": [
               {
@@ -1775,7 +1869,7 @@
       }
     },
     {
-      "id": 32,
+      "id": 34,
       "type": {
         "def": {
           "variant": {}

@@ -6,17 +6,6 @@ pub mod propertytoken {
     use openbrush::modifiers;
     use openbrush::traits::{Storage, String};
 
-    #[ink::trait_definition]
-    pub trait CustomPSP34 {
-        #[ink(message)]
-        #[modifiers(only_owner)]
-        fn mint_property(&mut self, to: AccountId, token_cid: Vec<u8>) -> Result<(), PSP34Error>;
-
-        #[ink(message)]
-        #[modifiers(only_owner)]
-        fn burn_property(&mut self, to: AccountId, token_cid: Vec<u8>) -> Result<(), PSP34Error>;
-    }
-
     #[ink(storage)]
     #[derive(Default, Storage)]
     pub struct PropertyToken {
@@ -58,18 +47,24 @@ pub mod propertytoken {
         pub fn mint(&mut self, account: AccountId, id: Vec<u8>) -> Result<(), PSP34Error> {
             self.mint_property(account, id)
         }
-    }
 
-    impl CustomPSP34 for PropertyToken {
         #[ink(message)]
         #[modifiers(only_owner)]
-        fn mint_property(&mut self, to: AccountId, token_cid: Vec<u8>) -> Result<(), PSP34Error> {
+        pub fn mint_property(
+            &mut self,
+            to: AccountId,
+            token_cid: Vec<u8>,
+        ) -> Result<(), PSP34Error> {
             psp34::InternalImpl::_mint_to(self, to, Id::Bytes(token_cid.to_vec()))
         }
 
         #[ink(message)]
         #[modifiers(only_owner)]
-        fn burn_property(&mut self, from: AccountId, token_cid: Vec<u8>) -> Result<(), PSP34Error> {
+        pub fn burn_property(
+            &mut self,
+            from: AccountId,
+            token_cid: Vec<u8>,
+        ) -> Result<(), PSP34Error> {
             psp34::InternalImpl::_burn_from(self, from, Id::Bytes(token_cid.to_vec()))
         }
     }
