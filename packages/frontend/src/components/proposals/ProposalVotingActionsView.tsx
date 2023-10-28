@@ -30,38 +30,30 @@ export const VoteOnProposal = ({
   const [voteStats, setStats] = useState<Vote>()
   const { contract } = useRegisteredContract(ContractIds.Dao)
 
-  const fetchVotesStats = useCallback(async (proposalId: number) => {
-    if (!contract || !api) {
-      console.log({ contract, api })
-      return null
-    }
-
-    console.log('run progresses')
-
-    setFetching(true)
-    try {
-      const result = await contractQuery(api, '', contract, 'get_all_votes_of_proposal', {}, [
-        proposalId,
-      ])
-      const { output, isError, decodedOutput } = decodeOutput(
-        result,
-        contract,
-        'get_all_votes_of_proposal',
-      )
-      console.log({ output })
-      if (isError) throw new Error(decodedOutput)
-
-      setStats(output)
-    } catch (e) {
-      console.error(e)
-      toast.error('Error while fetching votes stats. Try again…')
-      return null
-    } finally {
-      setFetching(false)
-    }
-  }, [])
   useEffect(() => {
-    if (proposal && proposal.proposalId) {
+    const fetchVotesStats = async (proposalId: number) => {
+      setFetching(true)
+      try {
+        const result = await contractQuery(api!, '', contract!, 'get_all_votes_of_proposal', {}, [
+          proposalId,
+        ])
+        const { output, isError, decodedOutput } = decodeOutput(
+          result,
+          contract!,
+          'get_all_votes_of_proposal',
+        )
+        if (isError) throw new Error(decodedOutput)
+
+        setStats(output)
+      } catch (e) {
+        console.error(e)
+        toast.error('Error while fetching votes stats. Try again…')
+        return null
+      } finally {
+        setFetching(false)
+      }
+    }
+    if (!!contract && !!api) {
       fetchVotesStats(proposal.proposalId)
     }
   }, [proposal, contract, api])

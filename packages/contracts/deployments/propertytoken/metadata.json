@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xbce8abc5f1d76a9d45c360461e7c143458c9ba909787514a62504067bd16086a",
+    "hash": "0x6ec6f2e5a37178741d38c5c728628d41f3a1d8f1e4e666d09c3b00bbf96ff01e",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -90,7 +90,7 @@
       {
         "args": [
           {
-            "label": "to",
+            "label": "account",
             "type": {
               "displayName": [
                 "AccountId"
@@ -99,7 +99,7 @@
             }
           },
           {
-            "label": "token_cid",
+            "label": "id",
             "type": {
               "displayName": [
                 "Vec"
@@ -110,9 +110,9 @@
         ],
         "default": false,
         "docs": [],
-        "label": "mint_property",
+        "label": "mint",
         "mutates": true,
-        "payable": false,
+        "payable": true,
         "returnType": {
           "displayName": [
             "ink",
@@ -120,15 +120,16 @@
           ],
           "type": 12
         },
-        "selector": "0x6cdf2afd"
+        "selector": "0xcfdd9aa2"
       },
       {
         "args": [
           {
-            "label": "from",
+            "label": "to",
             "type": {
               "displayName": [
-                "AccountId"
+                "custompsp34_external",
+                "BurnPropertyInput1"
               ],
               "type": 0
             }
@@ -137,7 +138,8 @@
             "label": "token_cid",
             "type": {
               "displayName": [
-                "Vec"
+                "custompsp34_external",
+                "BurnPropertyInput2"
               ],
               "type": 9
             }
@@ -145,7 +147,7 @@
         ],
         "default": false,
         "docs": [],
-        "label": "burn_property",
+        "label": "CustomPSP34::burn_property",
         "mutates": true,
         "payable": false,
         "returnType": {
@@ -155,7 +157,44 @@
           ],
           "type": 12
         },
-        "selector": "0x6a971839"
+        "selector": "0xff02839b"
+      },
+      {
+        "args": [
+          {
+            "label": "to",
+            "type": {
+              "displayName": [
+                "custompsp34_external",
+                "MintPropertyInput1"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "token_cid",
+            "type": {
+              "displayName": [
+                "custompsp34_external",
+                "MintPropertyInput2"
+              ],
+              "type": 9
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "CustomPSP34::mint_property",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 12
+        },
+        "selector": "0xaa728694"
       },
       {
         "args": [
@@ -205,6 +244,53 @@
         "selector": "0x4790f55a"
       },
       {
+        "args": [
+          {
+            "label": "to",
+            "type": {
+              "displayName": [
+                "psp34_external",
+                "TransferInput1"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "id",
+            "type": {
+              "displayName": [
+                "psp34_external",
+                "TransferInput2"
+              ],
+              "type": 16
+            }
+          },
+          {
+            "label": "data",
+            "type": {
+              "displayName": [
+                "psp34_external",
+                "TransferInput3"
+              ],
+              "type": 9
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "PSP34::transfer",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 12
+        },
+        "selector": "0x3128d61b"
+      },
+      {
         "args": [],
         "default": false,
         "docs": [],
@@ -219,6 +305,22 @@
           "type": 19
         },
         "selector": "0xffa27a5f"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "PSP34::total_supply",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 20
+        },
+        "selector": "0x628413fe"
       },
       {
         "args": [
@@ -268,10 +370,21 @@
         "selector": "0x1932a8b0"
       },
       {
-        "args": [],
+        "args": [
+          {
+            "label": "id",
+            "type": {
+              "displayName": [
+                "psp34_external",
+                "OwnerOfInput1"
+              ],
+              "type": 16
+            }
+          }
+        ],
         "default": false,
         "docs": [],
-        "label": "PSP34::total_supply",
+        "label": "PSP34::owner_of",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -279,56 +392,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 20
+          "type": 21
         },
-        "selector": "0x628413fe"
-      },
-      {
-        "args": [
-          {
-            "label": "to",
-            "type": {
-              "displayName": [
-                "psp34_external",
-                "TransferInput1"
-              ],
-              "type": 0
-            }
-          },
-          {
-            "label": "id",
-            "type": {
-              "displayName": [
-                "psp34_external",
-                "TransferInput2"
-              ],
-              "type": 16
-            }
-          },
-          {
-            "label": "data",
-            "type": {
-              "displayName": [
-                "psp34_external",
-                "TransferInput3"
-              ],
-              "type": 9
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "PSP34::transfer",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 12
-        },
-        "selector": "0x3128d61b"
+        "selector": "0x1168624d"
       },
       {
         "args": [
@@ -353,36 +419,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 21
+          "type": 23
         },
         "selector": "0xcde7e55f"
-      },
-      {
-        "args": [
-          {
-            "label": "id",
-            "type": {
-              "displayName": [
-                "psp34_external",
-                "OwnerOfInput1"
-              ],
-              "type": 16
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "PSP34::owner_of",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 22
-        },
-        "selector": "0x1168624d"
       },
       {
         "args": [
@@ -422,38 +461,6 @@
         "selector": "0x6c41f2ec"
       },
       {
-        "args": [],
-        "default": false,
-        "docs": [],
-        "label": "Ownable::renounce_ownership",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 24
-        },
-        "selector": "0x5e228753"
-      },
-      {
-        "args": [],
-        "default": false,
-        "docs": [],
-        "label": "Ownable::owner",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 22
-        },
-        "selector": "0x4fa43c8c"
-      },
-      {
         "args": [
           {
             "label": "new_owner",
@@ -479,6 +486,38 @@
           "type": 24
         },
         "selector": "0x11f43efd"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "Ownable::owner",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 21
+        },
+        "selector": "0x4fa43c8c"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "Ownable::renounce_ownership",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 24
+        },
+        "selector": "0x5e228753"
       },
       {
         "args": [
@@ -1417,6 +1456,81 @@
               {
                 "fields": [
                   {
+                    "type": 22
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 11
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 22
+          },
+          {
+            "name": "E",
+            "type": 11
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "None"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 0
+                  }
+                ],
+                "index": 1,
+                "name": "Some"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          }
+        ],
+        "path": [
+          "Option"
+        ]
+      }
+    },
+    {
+      "id": 23,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
                     "type": 4
                   }
                 ],
@@ -1447,81 +1561,6 @@
         ],
         "path": [
           "Result"
-        ]
-      }
-    },
-    {
-      "id": 22,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 23
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 11
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 23
-          },
-          {
-            "name": "E",
-            "type": 11
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 23,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "None"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 0
-                  }
-                ],
-                "index": 1,
-                "name": "Some"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 0
-          }
-        ],
-        "path": [
-          "Option"
         ]
       }
     },

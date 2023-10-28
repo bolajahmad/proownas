@@ -1,7 +1,7 @@
 {
-  "name": "@inkathon/contracts",
+  "name": "proownas-dao",
   "version": "0.0.1",
-  "homepage": "https://inkathon.xyz",
+  "homepage": "https://proownas-frontend.vercel.app",
   "type": "module",
   "scripts": {
     "test": "./test-all.sh",

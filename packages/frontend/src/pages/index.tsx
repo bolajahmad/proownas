@@ -1,3 +1,4 @@
+import { DAOStatsView } from '@components/home/DisplayDAOStats'
 import { HomePageTitle } from '@components/home/HomePageTitle'
 import { CenterBody } from '@components/layout/CenterBody'
 import { ChainInfo } from '@components/web3/ChainInfo'
@@ -7,14 +8,6 @@ import type { NextPage } from 'next'
 import { useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import 'twin.macro'
-
-// export const getStaticProps = (async (context) => {
-//   const res = await fetch('https://api.github.com/repos/vercel/next.js')
-//   const repo = await res.json()
-//   return { props: { repo } }
-// }) satisfies GetStaticProps<{
-//   repo: Repo
-// }>
 
 const HomePage: NextPage = () => {
   // Display `useInkathon` error messages (optional)
@@ -26,16 +19,16 @@ const HomePage: NextPage = () => {
 
   return (
     <>
-      <CenterBody tw="mt-20 mb-10 px-5">
-        {/* Title */}
+      <CenterBody tw="mt-10 mb-10 px-5">
         <HomePageTitle />
 
-        <div tw="mt-10 flex w-full flex-wrap items-start justify-center gap-4">
-          {/* Chain Metadata Information */}
-          <ChainInfo />
+        <div tw="w-full">
+          <DAOStatsView />
+        </div>
 
-          {/* Greeter Read/Write Contract Interactions */}
-          <GreeterContractInteractions />
+        <div tw="mt-10 flex w-full flex-wrap items-start justify-start gap-4">
+          <ChainInfo />
+          <ChainInfo />
         </div>
       </CenterBody>
     </>

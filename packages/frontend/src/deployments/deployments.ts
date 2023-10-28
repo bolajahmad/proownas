@@ -14,13 +14,13 @@ export const getDeployments = async (): Promise<SubstrateDeployment[]> => {
         contractId: ContractIds.Dao,
         networkId: network,
         abi: await import(`@inkathon/contracts/deployments/dao/metadata.json`),
-        address: 'bQ7VDasSoTRGGtYN4RD7Z66QosXVusS4CG5vyD1vH4PQnfy',
+        address: 'bX8iJnG9v7bECtW2HuqyuoLbVzhE6swgQrxc8LsuFS8ZQT8',
       },
       {
         contractId: ContractIds.PropertyToken,
         networkId: network,
         abi: await import(`@inkathon/contracts/deployments/propertytoken/metadata.json`),
-        address: 'ZhnTPEn5BuMa8u7sgGnwLHBVeWtibrZmSGLE64HtbNtMNDs',
+        address: 'Z6WUHcdfDm3dMSRfewtub4kf7KoYLsp9szDbHjWTuhSgMD8',
       },
     ])
     .reduce(async (acc, curr) => [...(await acc), ...(await curr)], [] as any)

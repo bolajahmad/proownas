@@ -86,8 +86,6 @@ const ProposalDetailForm = ({
   }
 
   const onSubmit = async (values: any) => {
-    console.log({ values })
-
     // convert eact file into an CIDs
     const files = values.files
     const client = makeWeb3StorageClient()

@@ -1,14 +1,14 @@
 {
-  "name": "@inkathon/monorepo",
-  "description": "Full-Stack DApp Boilerplate for Substrate-based networks and ink! Smart Contracts",
+  "name": "proownas-dao",
+  "description": "Fullstack Dapp for creating a DAO, built on NextJS and ink! WASM",
   "version": "0.0.1",
-  "homepage": "https://inkathon.xyz",
+  "homepage": "https://proownas-frontend.vercel.app",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/scio-labs/inkathon"
+    "url": "git+https://github.com/bolajahmad/proownas"
   },
   "bugs": {
-    "url": "https://github.com/scio-labs/inkathon/issues"
+    "url": "https://github.com/bolajahmad/proownas/issues"
   },
   "private": true,
   "workspaces": [
