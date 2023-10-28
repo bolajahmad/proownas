@@ -58,4 +58,4 @@ This is the powerhouse PSP34 token contract that manages the minting and burning
 
 ### The Multisig contract
 
-The multisig is borrowed from the list of ink-examples, the multisig contract.
+The multisig is borrowed from the list of ink-examples, the multisig contract. Refer to the (Multisig contract example)[https://github.com/paritytech/ink-examples/blob/main/multisig/lib.rs] by the parity tea. This Multisig is based totally on it with adjustment to the retrieve_owners function.

@@ -5,7 +5,7 @@
 ![Tailwind](https://img.shields.io/badge/Tailwind-pink)
 ![ink!](https://img.shields.io/badge/ink!-purple)
 
-<img src="packages/frontend/public/images/cover.jpg" width="800" height="auto" alt="Cover Image" />
+<img src="assets/DAO-contract-basic-flow.jpg" width="800" height="auto" alt="Cover Image" />
 
 ---
 

@@ -109,7 +109,7 @@ export const ProposalById = ({ id }: { id: string }) => {
     if (selectedProposal) fetchProposalIPFSData(selectedProposal?.proposalCid)
   }, [selectedProposal])
   const [days, hours, minutes] = useMemo(() => {
-    let timeLeft = votingDeadline * 3 // a block is approximately 3-4 seconds
+    let timeLeft = votingDeadline * 6 // a block is approximately 3-4 seconds
 
     //convert to hours
     const days = timeLeft / (60 * 60 * 24)
