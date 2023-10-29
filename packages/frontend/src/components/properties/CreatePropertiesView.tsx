@@ -1,25 +1,28 @@
 import { Button } from '@chakra-ui/react'
 import { TextArea, TextInput } from '@components/utils/InputArea'
 import { makeWeb3StorageClient } from '@config/getSupportedChains'
+import { ContractIds } from '@deployments/deployments'
 import { Dialog } from '@headlessui/react'
-import { useWriteProposal } from '@utils/hooks/useWriteProposal'
-import React, { Fragment, useState } from 'react'
+import { useInkathon, useRegisteredContract } from '@scio-labs/use-inkathon'
+import { contractTxWithToast } from '@utils/contractTxWithToast'
+import { Fragment, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import { AiOutlinePlusCircle } from 'react-icons/ai'
 import { FiPlus, FiX } from 'react-icons/fi'
 import 'twin.macro'
 
-export const CreateProposalView = () => {
-  const [isOpen, setIsOpen] = useState<false | 1 | 2>(false)
+export const CreatePropertiesView = () => {
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <Fragment>
       <Button
-        onClick={() => setIsOpen(1)}
+        onClick={() => setIsOpen(true)}
         tw="flex items-center gap-3 bg-blue-500 text-lg hover:bg-blue-700"
       >
         <AiOutlinePlusCircle size={20} />
-        Create Proposal
+        Add Owner&apos;s Asset
       </Button>
 
       <Dialog open={!!isOpen} onClose={() => setIsOpen(false)} tw="relative z-50">
@@ -35,16 +38,16 @@ export const CreateProposalView = () => {
             >
               <FiX size={18} />
             </Button>
-            <Dialog.Title tw="font-bold text-4xl">Create Proposal</Dialog.Title>
+            <Dialog.Title tw="font-bold text-4xl">Mint owner&apos;s property</Dialog.Title>
 
             <div tw="mt-4">
               <p>
-                <span tw="font-bold">Creating Proposal...</span>
+                <span tw="font-bold">Complete the form...</span>
               </p>
             </div>
 
             <div tw="mt-4 w-full">
-              {isOpen === 1 && (
+              {isOpen && (
                 <ProposalDetailForm
                   onComplete={() => setIsOpen(false)}
                   onCancel={() => setIsOpen(false)}
@@ -65,7 +68,9 @@ const ProposalDetailForm = ({
   onCancel?: () => void
   onComplete: (values?: any) => void
 }) => {
-  const { createProposal, isSubmitting } = useWriteProposal()
+  const [isSubmitting, setSubmitting] = useState(false)
+  const { api, activeAccount, activeSigner } = useInkathon()
+  const { contract } = useRegisteredContract(ContractIds.Dao)
   const { handleSubmit, register, watch, setValue } = useForm({
     reValidateMode: 'onBlur',
   })
@@ -100,7 +105,23 @@ const ProposalDetailForm = ({
     const proposal_files = [new File([proposal_blob], `proposal.json`)]
     const proposalCID = await client.put(proposal_files)
 
-    createProposal(proposalCID, values.duration).then(() => onComplete())
+    if (!activeAccount || !contract || !activeSigner || !api) {
+      toast.error('Wallet not connected. Try again…')
+      return
+    }
+
+    // send submit_new_asset message
+    setSubmitting(true)
+    try {
+      await contractTxWithToast(api, activeAccount.address, contract, 'set_default_assets', {}, [
+        [proposalCID],
+      ])
+    } catch (error) {
+      console.error(error)
+      throw error
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -119,13 +140,6 @@ const ProposalDetailForm = ({
         label="Description"
         placeholder="Enter short description"
         register={register}
-      />
-      <TextInput
-        label="Duration (in days)"
-        name="duration"
-        type="number"
-        register={register}
-        placeholder={`enter duration of voting in days`}
       />
       {watch('reference')?.length
         ? watch('reference')?.map(({ id }: any, index: number) => (

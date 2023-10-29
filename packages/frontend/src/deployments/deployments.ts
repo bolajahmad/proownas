@@ -4,6 +4,7 @@ import { SubstrateDeployment } from '@scio-labs/use-inkathon'
 export enum ContractIds {
   Dao = 'dao',
   PropertyToken = 'propertytoken',
+  Multisig = 'multisig',
 }
 
 export const getDeployments = async (): Promise<SubstrateDeployment[]> => {
@@ -14,13 +15,19 @@ export const getDeployments = async (): Promise<SubstrateDeployment[]> => {
         contractId: ContractIds.Dao,
         networkId: network,
         abi: await import(`@inkathon/contracts/deployments/dao/metadata.json`),
-        address: 'bQ7VDasSoTRGGtYN4RD7Z66QosXVusS4CG5vyD1vH4PQnfy',
+        address: 'WBHemgUgSy3X7N6kVw4mcwFavCHPsTGGtEWzhExayLiUVV2',
       },
       {
         contractId: ContractIds.PropertyToken,
         networkId: network,
         abi: await import(`@inkathon/contracts/deployments/propertytoken/metadata.json`),
-        address: 'YAEtNFRedZUHHKJQj9Qp5Qu88E9hGugGXUtKPTcYdKwAweL',
+        address: 'bAPfbTiwRaY6tUf8F9UyyM4B19gt4gQgeYmWpVHJiGiDp7b',
+      },
+      {
+        contractId: ContractIds.Multisig,
+        networkId: network,
+        abi: await import(`@inkathon/contracts/deployments/multisig/metadata.json`),
+        address: 'WX8zrBMqAhSboR2NDJJcPEdJtnkEaEqqQzJYeeoDUDQrmiy',
       },
     ])
     .reduce(async (acc, curr) => [...(await acc), ...(await curr)], [] as any)

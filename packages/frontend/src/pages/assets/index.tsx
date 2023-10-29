@@ -1,8 +1,6 @@
-import { DAOStatsView } from '@components/home/DisplayDAOStats'
-import { HomePageTitle } from '@components/home/HomePageTitle'
 import { CenterBody } from '@components/layout/CenterBody'
-import { ChainInfo } from '@components/web3/ChainInfo'
-import { GreeterContractInteractions } from '@components/web3/GreeterContractInteractions'
+import { CreatePropertiesView } from '@components/properties/CreatePropertiesView'
+import { PropertiesView } from '@components/properties/PropertiesView'
 import { useInkathon } from '@scio-labs/use-inkathon'
 import type { NextPage } from 'next'
 import { useEffect } from 'react'
@@ -19,17 +17,16 @@ const HomePage: NextPage = () => {
 
   return (
     <>
-      <CenterBody tw="mt-10 mb-10 px-5">
-        <HomePageTitle />
+      <CenterBody tw="mb-10 px-5">
+        <div tw="mt-20 flex w-full items-center justify-between rounded-md bg-gray-900 px-16 py-6">
+          <h2 tw="font-bold text-3xl">All Properties</h2>
 
-        <div tw="w-full">
-          <DAOStatsView />
+          <div>
+            <CreatePropertiesView />
+          </div>
         </div>
 
-        <div tw="mt-10 flex w-full flex-wrap items-start justify-start gap-4">
-          <ChainInfo />
-          <ChainInfo />
-        </div>
+        <PropertiesView />
       </CenterBody>
     </>
   )

@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xbce8abc5f1d76a9d45c360461e7c143458c9ba909787514a62504067bd16086a",
+    "hash": "0x4c9a9d32a0a1230d588bf460f7b6d1198dfacbc827ca50ab0e903022056f5ae9",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -90,6 +90,41 @@
       {
         "args": [
           {
+            "label": "account",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "id",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 9
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "mint",
+        "mutates": true,
+        "payable": true,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 12
+        },
+        "selector": "0xcfdd9aa2"
+      },
+      {
+        "args": [
+          {
             "label": "to",
             "type": {
               "displayName": [
@@ -158,6 +193,49 @@
         "selector": "0x6a971839"
       },
       {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "PSP34::total_supply",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 15
+        },
+        "selector": "0x628413fe"
+      },
+      {
+        "args": [
+          {
+            "label": "owner",
+            "type": {
+              "displayName": [
+                "psp34_external",
+                "BalanceOfInput1"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "PSP34::balance_of",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 16
+        },
+        "selector": "0xcde7e55f"
+      },
+      {
         "args": [
           {
             "label": "owner",
@@ -186,7 +264,7 @@
                 "psp34_external",
                 "AllowanceInput3"
               ],
-              "type": 15
+              "type": 17
             }
           }
         ],
@@ -200,7 +278,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 17
+          "type": 19
         },
         "selector": "0x4790f55a"
       },
@@ -216,7 +294,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 19
+          "type": 21
         },
         "selector": "0xffa27a5f"
       },
@@ -239,7 +317,7 @@
                 "psp34_external",
                 "ApproveInput2"
               ],
-              "type": 15
+              "type": 17
             }
           },
           {
@@ -249,7 +327,7 @@
                 "psp34_external",
                 "ApproveInput3"
               ],
-              "type": 18
+              "type": 20
             }
           }
         ],
@@ -268,10 +346,21 @@
         "selector": "0x1932a8b0"
       },
       {
-        "args": [],
+        "args": [
+          {
+            "label": "id",
+            "type": {
+              "displayName": [
+                "psp34_external",
+                "OwnerOfInput1"
+              ],
+              "type": 18
+            }
+          }
+        ],
         "default": false,
         "docs": [],
-        "label": "PSP34::total_supply",
+        "label": "PSP34::owner_of",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -279,9 +368,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 20
+          "type": 22
         },
-        "selector": "0x628413fe"
+        "selector": "0x1168624d"
       },
       {
         "args": [
@@ -302,7 +391,7 @@
                 "psp34_external",
                 "TransferInput2"
               ],
-              "type": 16
+              "type": 18
             }
           },
           {
@@ -333,60 +422,6 @@
       {
         "args": [
           {
-            "label": "owner",
-            "type": {
-              "displayName": [
-                "psp34_external",
-                "BalanceOfInput1"
-              ],
-              "type": 0
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "PSP34::balance_of",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 21
-        },
-        "selector": "0xcde7e55f"
-      },
-      {
-        "args": [
-          {
-            "label": "id",
-            "type": {
-              "displayName": [
-                "psp34_external",
-                "OwnerOfInput1"
-              ],
-              "type": 16
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "PSP34::owner_of",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 22
-        },
-        "selector": "0x1168624d"
-      },
-      {
-        "args": [
-          {
             "label": "account",
             "type": {
               "displayName": [
@@ -403,7 +438,7 @@
                 "psp34mintable_external",
                 "MintInput2"
               ],
-              "type": 16
+              "type": 18
             }
           }
         ],
@@ -425,22 +460,6 @@
         "args": [],
         "default": false,
         "docs": [],
-        "label": "Ownable::renounce_ownership",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 24
-        },
-        "selector": "0x5e228753"
-      },
-      {
-        "args": [],
-        "default": false,
-        "docs": [],
         "label": "Ownable::owner",
         "mutates": false,
         "payable": false,
@@ -452,6 +471,22 @@
           "type": 22
         },
         "selector": "0x4fa43c8c"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "Ownable::renounce_ownership",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 24
+        },
+        "selector": "0x5e228753"
       },
       {
         "args": [
@@ -489,7 +524,7 @@
                 "psp34metadata_external",
                 "GetAttributeInput1"
               ],
-              "type": 16
+              "type": 18
             }
           },
           {
@@ -1171,13 +1206,97 @@
           "variant": {
             "variants": [
               {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 11
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 5
+          },
+          {
+            "name": "E",
+            "type": 11
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 4
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 11
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 4
+          },
+          {
+            "name": "E",
+            "type": 11
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
                 "index": 0,
                 "name": "None"
               },
               {
                 "fields": [
                   {
-                    "type": 16
+                    "type": 18
                   }
                 ],
                 "index": 1,
@@ -1189,7 +1308,7 @@
         "params": [
           {
             "name": "T",
-            "type": 16
+            "type": 18
           }
         ],
         "path": [
@@ -1198,7 +1317,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 18,
       "type": {
         "def": {
           "variant": {
@@ -1275,7 +1394,57 @@
       }
     },
     {
-      "id": 17,
+      "id": 19,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 20
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 11
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 20
+          },
+          {
+            "name": "E",
+            "type": 11
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "type": {
+        "def": {
+          "primitive": "bool"
+        }
+      }
+    },
+    {
+      "id": 21,
       "type": {
         "def": {
           "variant": {
@@ -1305,140 +1474,6 @@
           {
             "name": "T",
             "type": 18
-          },
-          {
-            "name": "E",
-            "type": 11
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 18,
-      "type": {
-        "def": {
-          "primitive": "bool"
-        }
-      }
-    },
-    {
-      "id": 19,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 16
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 11
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 16
-          },
-          {
-            "name": "E",
-            "type": 11
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 20,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 5
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 11
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 5
-          },
-          {
-            "name": "E",
-            "type": 11
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 21,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 4
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 11
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 4
           },
           {
             "name": "E",
@@ -1761,7 +1796,7 @@
               {
                 "fields": [
                   {
-                    "type": 16
+                    "type": 18
                   }
                 ],
                 "index": 0,
@@ -1782,7 +1817,7 @@
         "params": [
           {
             "name": "T",
-            "type": 16
+            "type": 18
           },
           {
             "name": "E",

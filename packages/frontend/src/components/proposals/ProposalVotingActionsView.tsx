@@ -1,18 +1,16 @@
 import { Button, Spinner } from '@chakra-ui/react'
-import { useProownasDAOContext } from '@context/ProownasDAO'
-import { Proposal, ProposalStatus, Vote, VoteType } from '../../types/customs'
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
-import { useVoteOnProposal } from '@utils/hooks/useVoteOnProposal'
-import 'twin.macro'
+import { ContractIds } from '@deployments/deployments'
 import {
   contractQuery,
   decodeOutput,
   useInkathon,
   useRegisteredContract,
 } from '@scio-labs/use-inkathon'
-import { ContractIds } from '@deployments/deployments'
-import toast from 'react-hot-toast'
 import { contractTxWithToast } from '@utils/contractTxWithToast'
+import { Fragment, useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
+import 'twin.macro'
+import { Proposal, ProposalStatus, Vote, VoteType } from '../../types/customs'
 
 export const VoteOnProposal = ({
   handleVote,
@@ -30,38 +28,30 @@ export const VoteOnProposal = ({
   const [voteStats, setStats] = useState<Vote>()
   const { contract } = useRegisteredContract(ContractIds.Dao)
 
-  const fetchVotesStats = useCallback(async (proposalId: number) => {
-    if (!contract || !api) {
-      console.log({ contract, api })
-      return null
-    }
-
-    console.log('run progresses')
-
-    setFetching(true)
-    try {
-      const result = await contractQuery(api, '', contract, 'get_all_votes_of_proposal', {}, [
-        proposalId,
-      ])
-      const { output, isError, decodedOutput } = decodeOutput(
-        result,
-        contract,
-        'get_all_votes_of_proposal',
-      )
-      console.log({ output })
-      if (isError) throw new Error(decodedOutput)
-
-      setStats(output)
-    } catch (e) {
-      console.error(e)
-      toast.error('Error while fetching votes stats. Try again…')
-      return null
-    } finally {
-      setFetching(false)
-    }
-  }, [])
   useEffect(() => {
-    if (proposal && proposal.proposalId) {
+    const fetchVotesStats = async (proposalId: number) => {
+      setFetching(true)
+      try {
+        const result = await contractQuery(api!, '', contract!, 'get_all_votes_of_proposal', {}, [
+          proposalId,
+        ])
+        const { output, isError, decodedOutput } = decodeOutput(
+          result,
+          contract!,
+          'get_all_votes_of_proposal',
+        )
+        if (isError) throw new Error(decodedOutput)
+
+        setStats(output)
+      } catch (e) {
+        console.error(e)
+        toast.error('Error while fetching votes stats. Try again…')
+        return null
+      } finally {
+        setFetching(false)
+      }
+    }
+    if (!!contract && !!api) {
       fetchVotesStats(proposal.proposalId)
     }
   }, [proposal, contract, api])
@@ -238,6 +228,7 @@ export const CloseVoteEvent = ({ proposal }: { proposal: Proposal }) => {
       setSubmitting(true)
       await contractTxWithToast(api, activeAccount.address, contract, 'create_proposal_asset', {}, [
         proposalId,
+        proposal.proposer,
       ])
     } catch (error) {
       console.error(error)

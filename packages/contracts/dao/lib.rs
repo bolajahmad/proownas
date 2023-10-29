@@ -4,28 +4,40 @@
 mod dao {
     use ink::env::call::{build_call, ExecutionInput, Selector};
     use ink::env::DefaultEnvironment;
-    use ink::prelude::{string::String, vec::Vec};
+    use ink::prelude::vec::Vec;
     use ink::storage::traits::StorageLayout;
     use ink::storage::Mapping;
     use scale::{Decode, Encode};
 
+    /// Emitted when proposal is created/updated
     #[ink(event)]
     pub struct ProposalUpdated {
+        /// The address of the proposal owner
         #[ink(topic)]
         owner: AccountId,
+        /// The proposal CID of the proposal
         proposal_cid: Vec<u8>,
+        /// The blocknumber where proposal was updated
         updated_at: u32,
+        /// The ID of the proposal that was updated
         proposal_id: u128,
     }
 
+    /// Emitted when a vote is casted
     #[ink(event)]
     pub struct VoteUpdated {
+        /// Vote address of the new voter
         #[ink(topic)]
         voter: AccountId,
+        /// The blocknumber where vote was cast
         updated_at: u32,
+        /// The voted decision: VoteType::Yes or VoteType::No
         vote: VoteType,
+        /// The ID of the proposal that was voted on
         proposal_id: u128,
+        /// The total number of votes for the proposal, after cast
         votes_for: Option<u64>,
+        /// The total number of votes against the proposal, after cast
         votes_against: Option<u64>,
     }
 
@@ -35,23 +47,32 @@ mod dao {
         AlreadyVoted,
         InvalidAsset,
         ProposalNotFound,
-        AsserExists,
+        AssetExists,
         TokenMintingFailed,
+        TokenBurningFailed,
         VotingHasEnded,
     }
 
+    /// Indicates the current status of a Proposal
     #[derive(Encode, Decode)]
     #[cfg_attr(
         feature = "std",
         derive(Debug, Clone, PartialEq, Eq, scale_info::TypeInfo, StorageLayout,)
     )]
     pub enum ProposalStatus {
+        /// Proposal is still dormant, this is possible if it has just been submitted
         Pending,
+        /// Proposal is being voted on
+        /// Need to call the activate_voting function to activate this status
         Ongoing,
+        /// Status of a proposal with more Yes than No votes,
+        /// and also more that 60% quota
         Approved,
+        /// Status of a rejected proposal.
         Rejected,
     }
 
+    /// The specified and allowed vote types
     #[derive(Encode, Decode)]
     #[cfg_attr(
         feature = "std",
@@ -63,60 +84,123 @@ mod dao {
     }
 
     pub type Result<T> = core::result::Result<T, Error>;
+    pub type ContentIdentifier = Vec<u8>;
 
+    /// A proposal can be submitted by anyone
+    /// It could be on aything
+    ///
+    /// 1. To join the DAO
+    /// 2. Decide on what to use Assets for
+    /// 3. Decide on actions for the DAO
+    ///
+    /// To submit a proposal, the user must supply valid evidence as PDFs
+    /// All related dpcuments must be combined and minted into a single folder on IPFS
+    /// This CID is what will be submitted as part of the proposal
     #[derive(Encode, Decode)]
     #[cfg_attr(
         feature = "std",
         derive(Debug, Clone, PartialEq, Eq, scale_info::TypeInfo, StorageLayout,)
     )]
     pub struct Proposal {
+        /// The current status of a proposal
         status: ProposalStatus,
+        /// The start_block of the proposal
         start_block: u32,
+        /// How long the voting period should last for
         duration: u32,
+        /// The address of the proposar (usually the owner)
         proposer: AccountId,
+        /// The UNIX timestamp when proposal was created
         created_at: u64,
-        proposal_cid: Vec<u8>,
+        /// The proposal CID obtained as mentioned in the struct description above
+        proposal_cid: ContentIdentifier,
+        /// The ID of the proposal
         proposal_id: u128,
     }
 
+    /// A struct representing the Vote information
+    /// Each proposal must have an associated Vote once the status is ProposalStatus::Ongoing
     #[derive(Encode, Decode)]
     #[cfg_attr(
         feature = "std",
         derive(Debug, Clone, PartialEq, Eq, scale_info::TypeInfo, StorageLayout,)
     )]
     pub struct Vote {
+        /// The total number of voters on the proposal
         voters: Vec<AccountId>,
+        /// ALl votes that are in support of the Proposal
         votes_for: Option<u64>,
+        /// All votes that are against the Proposal
         votes_against: Option<u64>,
+        /// The block when the vote was started
         start_block: u32,
     }
     #[ink(storage)]
     pub struct DAO {
-        cid_by_proposal_id: Mapping<u128, Vec<u8>>,
+        /// A quick way to return information about a Proposal
         proposal_by_id: Mapping<u128, Proposal>,
-        proposals_by_account: Mapping<AccountId, Vec<u128>>,
+        /// The total number of proposals to the DAO
+        /// This is also used to increment the proposal_id of each Proposal
         proposal_count: u128,
+        /// A list of all users in the DAO
+        /// A user is a member that has had an asset minted
+        /// Effectively, a Proposal to join the DAO must be approved
+        users: Vec<AccountId>,
+        /// Stores a list of all proposal IDs of an account
+        proposals_by_account: Mapping<AccountId, Vec<u128>>,
+        /// This allows a quick way to know how the vote casting is
+        /// For each proposal, there is a Vote struct
         votes_by_proposal: Mapping<u128, Vote>,
-        assets_owned: Mapping<Vec<u8>, AccountId>,
+        /// The address of the PSP34 contract that is
+        /// responsible for minting and burning new assets
         token_contract: AccountId,
+        /// A toggle to decide if the contract has default contracts
+        /// If false, members cannot mint NFTs and join the DAO
+        has_set_default_assets: bool,
     }
 
     impl DAO {
-        /// Creates a new greeter contract initialized with the given value.
+        /// The constructor of the contract.
+        /// supply initial asset to the DAO
+        ///
+        /// @param token_contract, the address of NFT wizard contract
+        /// @return an instantiated DAO contract
         #[ink(constructor)]
-        pub fn new(initial_assets: Vec<u8>) -> Self {
-            let mut assets_owned = Mapping::new();
-            let caller = Self::env().caller();
-            assets_owned.insert(initial_assets, &caller);
+        pub fn new(token_contract: AccountId) -> Self {
             Self {
-                cid_by_proposal_id: Mapping::new(),
                 proposal_by_id: Mapping::new(),
+                users: Vec::new(),
                 proposals_by_account: Mapping::new(),
                 proposal_count: 0,
                 votes_by_proposal: Mapping::new(),
-                assets_owned,
-                token_contract: AccountId::from([0x00; 32]),
+                token_contract,
+                has_set_default_assets: false,
             }
+        }
+
+        /// This is callable by the owner(s) of the DAO (this would ideally be a multisig)
+        /// This message does not need to be voted on
+        /// It can be used to set assets owned by the DAO owners at the start of Dapp
+        ///
+        /// @param initial_assets, a list of IPFS CIDs of assets to be minted
+        /// This would be minted and owned by the DAO owners
+        /// This call would toggle the status of the has_set_default_assets to true
+        #[ink(message)]
+        pub fn set_default_assets(&mut self, initial_assets: Vec<ContentIdentifier>) -> Result<()> {
+            assert!(self.token_contract != AccountId::from([0x0; 32]));
+            let mut to_return: Result<()> = Ok(());
+            for asset in initial_assets {
+                let result = self.execute_mint_message(self.env().account_id(), asset);
+                to_return = match result {
+                    true => {
+                        self.has_set_default_assets = true;
+                        Ok(())
+                    }
+                    false => Err(Error::TokenMintingFailed),
+                };
+            }
+
+            to_return
         }
 
         /* Submit a new proposal to the DAO
@@ -126,28 +210,23 @@ mod dao {
          ** @param days: duration of the voting period in days
          */
         #[ink(message)]
-        pub fn submit_new_asset(
+        pub fn submit_new_proposal(
             &mut self,
-            proposal_cid: Vec<u8>,
+            proposal_cid: ContentIdentifier,
             created_at: u64,
             days: u32,
         ) -> Result<()> {
-            let caller: AccountId = self.env().caller();
+            assert!(self.has_set_default_assets, "Must have set owner's assets");
+            self.ensure_valid_cid(&proposal_cid);
+            assert!(self.ensure_new_cid(&proposal_cid).is_none());
+            let caller = self.env().caller();
+
+            // fetch the proposal count
+            let proposal_count = self.proposal_count.checked_add(1).unwrap();
+            // fetch the proposals of caller
             let mut proposals_of = self.proposals_by_account.get(&caller).unwrap_or(Vec::new());
-
-            assert!(proposal_cid.len() > 3, "Invalid CID");
-
-            let proposal_exists = match &self.assets_owned.get(&proposal_cid) {
-                Some(_) => true,
-                None => false,
-            };
-            // proposal_cid must be existent, need to update the proposal in that case.
-            assert!(!proposal_exists, "Proposal exists");
-            self.assets_owned.insert(&proposal_cid, &caller);
-
-            let mut proposal_count = self.proposal_count;
-            proposal_count += 1;
             proposals_of.push(proposal_count);
+
             self.proposals_by_account
                 .insert(&caller, &proposals_of.clone());
 
@@ -164,9 +243,11 @@ mod dao {
             };
 
             self.proposal_count = proposal_count;
-            self.cid_by_proposal_id
-                .insert(&proposal_count, &proposal_cid);
             self.proposal_by_id.insert(&proposal_count, &proposal);
+            let is_existing = self.users.iter().any(|a| *a == caller);
+            if !is_existing {
+                self.users.push(caller);
+            };
 
             self.env().emit_event(ProposalUpdated {
                 owner: caller,
@@ -186,24 +267,14 @@ mod dao {
             let proposal_option = self.proposal_by_id.get(&proposal_id);
 
             if let Some(mut proposal) = proposal_option {
-                let can_update_proposal = match proposal.status {
-                    ProposalStatus::Pending => true,
-                    _ => false,
-                };
-                assert!(can_update_proposal, "Proposal is active",);
+                self.ensure_pending_proposal(&proposal);
 
-                let caller_proposals = match self.proposals_by_account.get(&caller) {
-                    Some(ps) => ps,
-                    None => Vec::new(),
-                };
-                assert!(caller_proposals.len() > 0, "No proposals available");
-
+                let caller_proposals = self.ensure_is_member(&caller);
                 let current_proposal = caller_proposals.iter().any(|p| *p == proposal_id);
 
                 if current_proposal {
                     proposal.status = ProposalStatus::Ongoing;
                     self.proposal_by_id.insert(&proposal_id, &proposal);
-
                     self.votes_by_proposal.insert(
                         &proposal_id,
                         &Vote {
@@ -213,15 +284,18 @@ mod dao {
                             start_block: self.env().block_number(),
                         },
                     );
+
                     self.env().emit_event(ProposalUpdated {
                         owner: caller,
                         proposal_cid: proposal.proposal_cid,
                         proposal_id,
                         updated_at: self.env().block_number(),
                     });
-                }
 
-                Ok(())
+                    Ok(())
+                } else {
+                    Err(Error::InvalidAsset)
+                }
             } else {
                 Err(Error::InvalidAsset)
             }
@@ -232,6 +306,7 @@ mod dao {
             let caller = self.env().caller();
             let block_number = self.env().block_number();
             let proposal = self.proposal_by_id.get(&proposal_id).unwrap();
+
             let is_ongoing = match proposal.status {
                 ProposalStatus::Ongoing => true,
                 _ => false,
@@ -241,12 +316,6 @@ mod dao {
                 is_ongoing && (vote_stats.start_block + proposal.duration > block_number),
                 "ClosedProposal"
             );
-
-            let caller_proposals = match self.proposals_by_account.get(&caller) {
-                Some(ps) => ps,
-                None => Vec::new(),
-            };
-            assert!(caller_proposals.len() > 0, "Not a member");
 
             let mut existing_vote = self.votes_by_proposal.get(&proposal_id).unwrap();
             let is_existing_user = existing_vote.voters.iter().any(|v| *v == caller);
@@ -302,7 +371,7 @@ mod dao {
             match p {
                 Ok(mut proposal) => match proposal.status {
                     ProposalStatus::Ongoing => {
-                        let mut vote = self.votes_by_proposal.get(&proposal_id).unwrap();
+                        let vote = self.votes_by_proposal.get(&proposal_id).unwrap();
                         let vote_end_block = vote.start_block + proposal.duration;
                         assert!(
                             vote_end_block < self.env().block_number(),
@@ -312,9 +381,8 @@ mod dao {
                         // // calculate vote ratio
                         // // for approval, expect a VoteType::Yes greater than 60%% vote
                         // // for rejection: if total vote < 4
-                        let voters_count = (vote.voters.len() as u64);
-                        // assert!(vote.voters.len() > 4, "NotEnoughVotes");
-                        let (votes_for, votes_against): (u64, u64) = (
+                        let voters_count = vote.voters.len() as u64;
+                        let (votes_for, _): (u64, u64) = (
                             match vote.votes_for {
                                 Some(value) => value,
                                 None => 0,
@@ -328,7 +396,7 @@ mod dao {
                             .unwrap()
                             .checked_div(voters_count.checked_mul(100).unwrap())
                             .unwrap();
-                        if percentage < 65 || voters_count < 5 {
+                        if percentage < 65 || voters_count < 3 {
                             proposal.status = ProposalStatus::Rejected;
                         } else {
                             proposal.status = ProposalStatus::Approved;
@@ -359,22 +427,39 @@ mod dao {
             };
             assert!(is_approved_proposal, "Proposal must be approved");
 
-            let mint_result = build_call::<DefaultEnvironment>()
-                .call(self.token_contract)
-                .gas_limit(0)
-                .exec_input(
-                    ExecutionInput::new(Selector::new(ink::selector_bytes!("mint_property")))
-                        .push_arg(&owner)
-                        .push_arg(&current_proposal.proposal_cid),
-                )
-                .returns::<()>()
-                .try_invoke();
+            let result = self.execute_mint_message(owner, current_proposal.proposal_cid);
+            match result {
+                true => Ok(()),
+                false => Err(Error::TokenMintingFailed),
+            }
+        }
 
-            match mint_result {
-                Ok(Ok(_)) => Ok(()),
-                _ => Err(Error::TokenMintingFailed),
-            };
-            Ok(())
+        #[ink(message)]
+        pub fn destroy_asset(&mut self, asset_cid: ContentIdentifier) -> Result<()> {
+            let account_id = self.ensure_new_cid(&asset_cid);
+
+            match account_id {
+                Some(account) => {
+                    let burn_result = build_call::<DefaultEnvironment>()
+                        .call(self.token_contract)
+                        .gas_limit(0)
+                        .exec_input(
+                            ExecutionInput::new(Selector::new(ink::selector_bytes!(
+                                "burn_property"
+                            )))
+                            .push_arg(&account)
+                            .push_arg(&asset_cid),
+                        )
+                        .returns::<()>()
+                        .try_invoke();
+
+                    match burn_result {
+                        Ok(Ok(_)) => Ok(()),
+                        _ => Err(Error::TokenBurningFailed),
+                    }
+                }
+                None => Err(Error::TokenBurningFailed),
+            }
         }
 
         #[ink(message)]
@@ -409,9 +494,10 @@ mod dao {
         }
 
         #[ink(message)]
-        pub fn get_proposal_ipfs_data(&self, proposal_id: u128) -> Result<Vec<u8>> {
-            match self.cid_by_proposal_id.get(&proposal_id) {
-                Some(cid) => Ok(cid),
+        pub fn get_proposal_ipfs_data(&self, proposal_id: u128) -> Result<ContentIdentifier> {
+            let proposal = self.proposal_by_id.get(&proposal_id);
+            match proposal {
+                Some(p) => Ok(p.proposal_cid),
                 None => Err(Error::ProposalNotFound),
             }
         }
@@ -433,6 +519,75 @@ mod dao {
                     proposal.duration - block_spanned
                 }
             })
+        }
+
+        #[ink(message)]
+        pub fn get_all_users(&self) -> (Vec<AccountId>, u32) {
+            let all_users = &self.users;
+            let length = all_users.len() as u32;
+            (all_users.clone(), length)
+        }
+
+        pub fn ensure_valid_cid(&self, cid: &ContentIdentifier) {
+            assert!(cid.len() >= 5, "Invalid CID")
+        }
+
+        /// Called to verify that the proposal_cid submitted is a new proposal
+        /// It is sufficient to check the assets_pwned mapping
+        /// @param proposal_cid: IPFS CID of the propposal
+        pub fn ensure_new_cid(&self, proposal_cid: &ContentIdentifier) -> Option<AccountId> {
+            let result = build_call::<DefaultEnvironment>()
+                .call(self.token_contract)
+                .gas_limit(0)
+                .exec_input(
+                    ExecutionInput::new(Selector::new(ink::selector_bytes!("psp34::owner_of")))
+                        .push_arg(&proposal_cid),
+                )
+                .returns::<AccountId>()
+                .try_invoke();
+
+            match result {
+                Ok(Ok(account)) => Some(account),
+                _ => None,
+            }
+        }
+
+        pub fn ensure_is_member(&self, account: &AccountId) -> Vec<u128> {
+            let caller_proposals = self
+                .proposals_by_account
+                .get(&account)
+                .expect("Should be a DAO member");
+            caller_proposals
+        }
+
+        pub fn ensure_pending_proposal(&self, proposal: &Proposal) {
+            let is_pending = match &proposal.status {
+                ProposalStatus::Pending => true,
+                _ => false,
+            };
+            assert!(is_pending, "Proposal is active",)
+        }
+
+        pub fn execute_mint_message(
+            &self,
+            owner: AccountId,
+            proposal_cid: ContentIdentifier,
+        ) -> bool {
+            let mint_result = build_call::<DefaultEnvironment>()
+                .call(self.token_contract)
+                .gas_limit(0)
+                .exec_input(
+                    ExecutionInput::new(Selector::new(ink::selector_bytes!("mint_property")))
+                        .push_arg(&owner)
+                        .push_arg(&proposal_cid),
+                )
+                .returns::<()>()
+                .try_invoke();
+
+            match mint_result {
+                Ok(Ok(_)) => true,
+                _ => false,
+            }
         }
     }
     // #[cfg(test)]

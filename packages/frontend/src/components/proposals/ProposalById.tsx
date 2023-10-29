@@ -1,27 +1,64 @@
-import { Badge, Skeleton, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
-import { Proposal, ProposalStatus } from '../../types/customs'
-import { fetchMetadataByCID, useFetchProposal } from '@utils/hooks/useSingleProposal'
-import Link from 'next/link'
-import 'twin.macro'
-import { useProownasDAOContext } from '@context/ProownasDAO'
-import { useCallback, useEffect, useState } from 'react'
-import { ProposalVotingActionsView } from './ProposalVotingActionsView'
-import { truncateHash } from '@utils/truncateHash'
-import { useDAOProposal } from '@utils/hooks/useDAOProposal'
+import { Badge, Spinner, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
+import { ContractIds } from '@deployments/deployments'
 import {
   contractQuery,
   decodeOutput,
   useInkathon,
   useRegisteredContract,
 } from '@scio-labs/use-inkathon'
-import { ContractIds } from '@deployments/deployments'
+import { fetchMetadataByCID, useFetchProposal } from '@utils/hooks/useSingleProposal'
+import { truncateHash } from '@utils/truncateHash'
+import Link from 'next/link'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
+import 'twin.macro'
+import { Proposal, ProposalStatus } from '../../types/customs'
+import { ProposalVotingActionsView } from './ProposalVotingActionsView'
 
 export const ProposalById = ({ id }: { id: string }) => {
-  const { selectedProposal } = useProownasDAOContext()!
+  const [selectedProposal, setProposal] = useState<Proposal>()
   const [isLoading, setLoading] = useState(false)
+  const [votingDeadline, setDeadline] = useState(0)
   const [proposalMetadata, setMetadata] = useState<Record<string, any>>()
   const { proposalFiles } = useFetchProposal(id, selectedProposal?.proposalCid)
+  const { api } = useInkathon()
+  const { contract } = useRegisteredContract(ContractIds.Dao)
+
+  useEffect(() => {
+    async function fetchProposalById(proposalId: number): Promise<Proposal | null> {
+      if (!contract || !api) return null
+
+      setLoading(true)
+      try {
+        const result = await contractQuery(api, '', contract, 'getProposalById', {}, [proposalId])
+        const { output, isError, decodedOutput } = decodeOutput(result, contract, 'getProposalById')
+        if (isError) throw new Error(decodedOutput)
+        setProposal(output.Ok)
+
+        {
+          const result = await contractQuery(api, '', contract, 'get_voting_period_remaining', {}, [
+            proposalId,
+          ])
+          const { isError, output, decodedOutput } = decodeOutput(
+            result,
+            contract,
+            'get_voting_period_remaining',
+          )
+          if (isError) throw new Error(decodedOutput)
+
+          setDeadline(Number(output.split(',').join('')))
+        }
+        return output.Ok
+      } catch (e) {
+        console.error(e)
+        toast.error('Error while fetching proposal count. Try again…')
+        return null
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProposalById(Number(id))
+  }, [id, contract, api])
 
   const fetchProposalIPFSData = useCallback(async (proposalCid?: string) => {
     setLoading(true)
@@ -55,18 +92,30 @@ export const ProposalById = ({ id }: { id: string }) => {
       setLoading(false)
     }
   }, [])
-
   useEffect(() => {
-    fetchProposalIPFSData(selectedProposal?.proposalCid)
+    if (selectedProposal) fetchProposalIPFSData(selectedProposal?.proposalCid)
   }, [selectedProposal])
+  const [days, hours, minutes] = useMemo(() => {
+    let timeLeft = votingDeadline * 10 // a block is approximately 3-4 seconds
 
-  console.log({ selectedProposal, proposalMetadata, proposalFiles })
+    //convert to hours
+    const days = timeLeft / (60 * 60 * 24)
+    //get what's left
+    timeLeft = timeLeft % (60 * 60 * 24)
+    //convert to minutes
+    const hours = timeLeft / (60 * 60)
+    // get what's left
+    timeLeft = timeLeft % (60 * 60)
+    const minutes = timeLeft / 60
 
-  // if (isFetching) {
-  //   return <Skeleton h={20} />
-  // }
+    return [Math.floor(days), Math.floor(hours), Math.ceil(minutes)]
+  }, [selectedProposal, votingDeadline])
 
-  return (
+  return isLoading ? (
+    <div tw="mx-auto mt-10 text-center">
+      <Spinner />
+    </div>
+  ) : (
     <div tw="grid grid-cols-1 gap-10 md:grid-cols-2">
       <section tw="rounded-md bg-gray-900 p-3">
         <h2 tw="font-bold text-2xl">Proposal of {truncateHash(selectedProposal?.proposer, 5)}</h2>
@@ -117,18 +166,30 @@ export const ProposalById = ({ id }: { id: string }) => {
             </li>
             <li>
               <strong tw="text-gray-200">Start block:</strong>{' '}
-              <span>{selectedProposal?.startBlock}</span>
+              <span>{selectedProposal?.startBlock.toString().split(',').join('')}</span>
             </li>
             <li>
               <strong tw="text-gray-200">Vote duration:</strong>{' '}
               <span>{selectedProposal?.duration} blocks</span>
             </li>
-            <li>
-              <strong tw="text-gray-200">Voting active:</strong>{' '}
-              <span tw="uppercase">
-                {selectedProposal?.status == ProposalStatus.Ongoing ? 'true' : 'false'}
-              </span>
-            </li>
+            {selectedProposal?.status == ProposalStatus.Ongoing ? (
+              <li>
+                <strong tw="text-gray-200">Approximate end time:</strong>{' '}
+                <p tw="flex flex-1 items-center gap-1 text-sm">
+                  <span tw="flex items-center">
+                    <strong>{days}</strong> d
+                  </span>
+                  :
+                  <span tw="flex items-center">
+                    <strong>{hours}</strong> h
+                  </span>
+                  :
+                  <span tw="flex items-center">
+                    <strong>{minutes}</strong> m
+                  </span>
+                </p>
+              </li>
+            ) : null}
           </ul>
         </div>
 

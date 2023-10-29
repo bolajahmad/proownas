@@ -43,6 +43,11 @@ pub mod propertytoken {
             instance
         }
 
+        #[ink(message, payable)]
+        pub fn mint(&mut self, account: AccountId, id: Vec<u8>) -> Result<(), PSP34Error> {
+            self.mint_property(account, id)
+        }
+
         #[ink(message)]
         #[modifiers(only_owner)]
         pub fn mint_property(

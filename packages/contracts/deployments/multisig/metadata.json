@@ -1,0 +1,1512 @@
+{
+  "source": {
+    "hash": "0x4caf61002b10b14a673eb23340e9f21da31a902648f089b3a4504e76996e282f",
+    "language": "ink! 4.3.0",
+    "compiler": "rustc 1.69.0",
+    "build_info": {
+      "build_mode": "Release",
+      "cargo_contract_version": "3.0.1",
+      "rust_toolchain": "stable-aarch64-apple-darwin",
+      "wasm_opt_settings": {
+        "keep_debug_symbols": false,
+        "optimization_passes": "Z"
+      }
+    }
+  },
+  "contract": {
+    "name": "multisig",
+    "version": "0.0.1",
+    "authors": [
+      "Bolaji Ahmad"
+    ]
+  },
+  "spec": {
+    "constructors": [
+      {
+        "args": [
+          {
+            "label": "requirement",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 1
+            }
+          },
+          {
+            "label": "owners",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 10
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "new",
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink_primitives",
+            "ConstructorResult"
+          ],
+          "type": 11
+        },
+        "selector": "0x9bae9d5e"
+      }
+    ],
+    "docs": [],
+    "environment": {
+      "accountId": {
+        "displayName": [
+          "AccountId"
+        ],
+        "type": 2
+      },
+      "balance": {
+        "displayName": [
+          "Balance"
+        ],
+        "type": 6
+      },
+      "blockNumber": {
+        "displayName": [
+          "BlockNumber"
+        ],
+        "type": 1
+      },
+      "chainExtension": {
+        "displayName": [
+          "ChainExtension"
+        ],
+        "type": 29
+      },
+      "hash": {
+        "displayName": [
+          "Hash"
+        ],
+        "type": 28
+      },
+      "maxEventTopics": 4,
+      "timestamp": {
+        "displayName": [
+          "Timestamp"
+        ],
+        "type": 7
+      }
+    },
+    "events": [
+      {
+        "args": [
+          {
+            "docs": [
+              " The transaction that was confirmed."
+            ],
+            "indexed": true,
+            "label": "transaction",
+            "type": {
+              "displayName": [
+                "TransactionId"
+              ],
+              "type": 1
+            }
+          },
+          {
+            "docs": [
+              " The owner that sent the confirmation."
+            ],
+            "indexed": true,
+            "label": "from",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "docs": [
+              " The confirmation status after this confirmation was applied."
+            ],
+            "indexed": true,
+            "label": "status",
+            "type": {
+              "displayName": [
+                "ConfirmationStatus"
+              ],
+              "type": 19
+            }
+          }
+        ],
+        "docs": [
+          "Emitted when an owner confirms a transaction."
+        ],
+        "label": "Confirmation"
+      },
+      {
+        "args": [
+          {
+            "docs": [
+              " The transaction that was revoked."
+            ],
+            "indexed": true,
+            "label": "transaction",
+            "type": {
+              "displayName": [
+                "TransactionId"
+              ],
+              "type": 1
+            }
+          },
+          {
+            "docs": [
+              " The owner that sent the revocation."
+            ],
+            "indexed": true,
+            "label": "from",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 2
+            }
+          }
+        ],
+        "docs": [
+          "Emitted when an owner revoked a confirmation."
+        ],
+        "label": "Revocation"
+      },
+      {
+        "args": [
+          {
+            "docs": [
+              " The transaction that was submitted."
+            ],
+            "indexed": true,
+            "label": "transaction",
+            "type": {
+              "displayName": [
+                "TransactionId"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "docs": [
+          "Emitted when an owner submits a transaction."
+        ],
+        "label": "Submission"
+      },
+      {
+        "args": [
+          {
+            "docs": [
+              " The transaction that was canceled."
+            ],
+            "indexed": true,
+            "label": "transaction",
+            "type": {
+              "displayName": [
+                "TransactionId"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "docs": [
+          "Emitted when a transaction was canceled."
+        ],
+        "label": "Cancellation"
+      },
+      {
+        "args": [
+          {
+            "docs": [
+              " The transaction that was executed."
+            ],
+            "indexed": true,
+            "label": "transaction",
+            "type": {
+              "displayName": [
+                "TransactionId"
+              ],
+              "type": 1
+            }
+          },
+          {
+            "docs": [
+              " Indicates whether the transaction executed successfully. If so the `Ok` value",
+              " holds the output in bytes. The Option is `None` when the transaction",
+              " was executed through `invoke_transaction` rather than",
+              " `evaluate_transaction`."
+            ],
+            "indexed": true,
+            "label": "result",
+            "type": {
+              "displayName": [
+                "Result"
+              ],
+              "type": 26
+            }
+          }
+        ],
+        "docs": [
+          "Emitted when a transaction was executed."
+        ],
+        "label": "Execution"
+      },
+      {
+        "args": [
+          {
+            "docs": [
+              " The owner that was added."
+            ],
+            "indexed": true,
+            "label": "owner",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 2
+            }
+          }
+        ],
+        "docs": [
+          "Emitted when an owner is added to the wallet."
+        ],
+        "label": "OwnerAddition"
+      },
+      {
+        "args": [
+          {
+            "docs": [
+              " The owner that was removed."
+            ],
+            "indexed": true,
+            "label": "owner",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 2
+            }
+          }
+        ],
+        "docs": [
+          "Emitted when an owner is removed from the wallet."
+        ],
+        "label": "OwnerRemoval"
+      },
+      {
+        "args": [
+          {
+            "docs": [
+              " The new requirement value."
+            ],
+            "indexed": false,
+            "label": "new_requirement",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "docs": [
+          "Emitted when the requirement changed."
+        ],
+        "label": "RequirementChange"
+      }
+    ],
+    "lang_error": {
+      "displayName": [
+        "ink",
+        "LangError"
+      ],
+      "type": 12
+    },
+    "messages": [
+      {
+        "args": [
+          {
+            "label": "new_owner",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 2
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "add_owner",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0xad6d4358"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "retrieve_owners",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 13
+        },
+        "selector": "0x41707dc0"
+      },
+      {
+        "args": [
+          {
+            "label": "owner",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 2
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "remove_owner",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0xfdfe3353"
+      },
+      {
+        "args": [
+          {
+            "label": "old_owner",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "label": "new_owner",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 2
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "replace_owner",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0x7834854f"
+      },
+      {
+        "args": [
+          {
+            "label": "requirement",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "change_requirement",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0x9448dea5"
+      },
+      {
+        "args": [
+          {
+            "label": "transaction",
+            "type": {
+              "displayName": [
+                "Transaction"
+              ],
+              "type": 15
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Add a new transaction candidate to the contract.",
+          "",
+          " This also confirms the transaction for the caller. This can be called by any",
+          " owner."
+        ],
+        "label": "submit_transaction",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 17
+        },
+        "selector": "0x37d395a9"
+      },
+      {
+        "args": [
+          {
+            "label": "trans_id",
+            "type": {
+              "displayName": [
+                "TransactionId"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "cancel_transaction",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0x6614b0a8"
+      },
+      {
+        "args": [
+          {
+            "label": "trans_id",
+            "type": {
+              "displayName": [
+                "TransactionId"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Confirm a transaction for the sender that was submitted by any owner.",
+          "",
+          " This can be called by any owner.",
+          "",
+          " # Panics",
+          "",
+          " If `trans_id` is no valid transaction id."
+        ],
+        "label": "confirm_transaction",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 20
+        },
+        "selector": "0x41996bf0"
+      },
+      {
+        "args": [
+          {
+            "label": "trans_id",
+            "type": {
+              "displayName": [
+                "TransactionId"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "revoke_confirmation",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0xa871d5a0"
+      },
+      {
+        "args": [
+          {
+            "label": "trans_id",
+            "type": {
+              "displayName": [
+                "TransactionId"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "invoke_transaction",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 21
+        },
+        "selector": "0x3cd4b36d"
+      },
+      {
+        "args": [
+          {
+            "label": "trans_id",
+            "type": {
+              "displayName": [
+                "TransactionId"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "eval_transaction",
+        "mutates": true,
+        "payable": true,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 24
+        },
+        "selector": "0xda9878fb"
+      }
+    ]
+  },
+  "storage": {
+    "root": {
+      "layout": {
+        "struct": {
+          "fields": [
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "leaf": {
+                      "key": "0xf0617fc8",
+                      "ty": 0
+                    }
+                  },
+                  "root_key": "0xf0617fc8"
+                }
+              },
+              "name": "confirmations"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "leaf": {
+                      "key": "0x10d143fc",
+                      "ty": 1
+                    }
+                  },
+                  "root_key": "0x10d143fc"
+                }
+              },
+              "name": "confirmation_count"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "struct": {
+                      "fields": [
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x5fbdbb86",
+                              "ty": 2
+                            }
+                          },
+                          "name": "callee"
+                        },
+                        {
+                          "layout": {
+                            "array": {
+                              "layout": {
+                                "leaf": {
+                                  "key": "0x5fbdbb86",
+                                  "ty": 4
+                                }
+                              },
+                              "len": 4,
+                              "offset": "0x5fbdbb86"
+                            }
+                          },
+                          "name": "selector"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x5fbdbb86",
+                              "ty": 5
+                            }
+                          },
+                          "name": "input"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x5fbdbb86",
+                              "ty": 6
+                            }
+                          },
+                          "name": "transferred_value"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x5fbdbb86",
+                              "ty": 7
+                            }
+                          },
+                          "name": "gas_limit"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x5fbdbb86",
+                              "ty": 8
+                            }
+                          },
+                          "name": "allow_reentry"
+                        }
+                      ],
+                      "name": "Transaction"
+                    }
+                  },
+                  "root_key": "0x5fbdbb86"
+                }
+              },
+              "name": "transactions"
+            },
+            {
+              "layout": {
+                "struct": {
+                  "fields": [
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 9
+                        }
+                      },
+                      "name": "transactions"
+                    },
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 1
+                        }
+                      },
+                      "name": "next_id"
+                    }
+                  ],
+                  "name": "Transactions"
+                }
+              },
+              "name": "transaction_list"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 10
+                }
+              },
+              "name": "owners"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "leaf": {
+                      "key": "0x2fa3a3a3",
+                      "ty": 0
+                    }
+                  },
+                  "root_key": "0x2fa3a3a3"
+                }
+              },
+              "name": "is_owner"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 1
+                }
+              },
+              "name": "requirement"
+            }
+          ],
+          "name": "Multisig"
+        }
+      },
+      "root_key": "0x00000000"
+    }
+  },
+  "types": [
+    {
+      "id": 0,
+      "type": {
+        "def": {
+          "tuple": []
+        }
+      }
+    },
+    {
+      "id": 1,
+      "type": {
+        "def": {
+          "primitive": "u32"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 3,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "types",
+          "AccountId"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "type": {
+        "def": {
+          "array": {
+            "len": 32,
+            "type": 4
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": {
+        "def": {
+          "primitive": "u8"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": {
+        "def": {
+          "sequence": {
+            "type": 4
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": {
+        "def": {
+          "primitive": "u128"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": {
+        "def": {
+          "primitive": "u64"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": {
+        "def": {
+          "primitive": "bool"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": {
+        "def": {
+          "sequence": {
+            "type": 1
+          }
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": {
+        "def": {
+          "sequence": {
+            "type": 2
+          }
+        }
+      }
+    },
+    {
+      "id": 11,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 0
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 1,
+                "name": "CouldNotReadInput"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "LangError"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 14
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 14
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "type": {
+        "def": {
+          "tuple": [
+            10,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "callee",
+                "type": 2,
+                "typeName": "AccountId"
+              },
+              {
+                "name": "selector",
+                "type": 16,
+                "typeName": "[u8; 4]"
+              },
+              {
+                "name": "input",
+                "type": 5,
+                "typeName": "Vec<u8>"
+              },
+              {
+                "name": "transferred_value",
+                "type": 6,
+                "typeName": "Balance"
+              },
+              {
+                "name": "gas_limit",
+                "type": 7,
+                "typeName": "u64"
+              },
+              {
+                "name": "allow_reentry",
+                "type": 8,
+                "typeName": "bool"
+              }
+            ]
+          }
+        },
+        "path": [
+          "multisig",
+          "multisig",
+          "Transaction"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "type": {
+        "def": {
+          "array": {
+            "len": 4,
+            "type": 4
+          }
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 18
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 18
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "type": {
+        "def": {
+          "tuple": [
+            1,
+            19
+          ]
+        }
+      }
+    },
+    {
+      "id": 19,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "Confirmed"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 1,
+                    "typeName": "u32"
+                  }
+                ],
+                "index": 1,
+                "name": "ConfirmationsNeeded"
+              }
+            ]
+          }
+        },
+        "path": [
+          "multisig",
+          "multisig",
+          "ConfirmationStatus"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 19
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 19
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 22
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 22
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 0
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 23
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          },
+          {
+            "name": "E",
+            "type": 23
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 23,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "TransactionFailed"
+              }
+            ]
+          }
+        },
+        "path": [
+          "multisig",
+          "multisig",
+          "Error"
+        ]
+      }
+    },
+    {
+      "id": 24,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 25
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 25
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 25,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 23
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 5
+          },
+          {
+            "name": "E",
+            "type": 23
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 26,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 27
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 23
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 27
+          },
+          {
+            "name": "E",
+            "type": 23
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 27,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "None"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 1,
+                "name": "Some"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 5
+          }
+        ],
+        "path": [
+          "Option"
+        ]
+      }
+    },
+    {
+      "id": 28,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 3,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "types",
+          "Hash"
+        ]
+      }
+    },
+    {
+      "id": 29,
+      "type": {
+        "def": {
+          "variant": {}
+        },
+        "path": [
+          "ink_env",
+          "types",
+          "NoChainExtension"
+        ]
+      }
+    }
+  ],
+  "version": "4"
+}
