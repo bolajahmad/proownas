@@ -155,12 +155,16 @@ mod dao {
         /// responsible for minting and burning new assets
         token_contract: AccountId,
         /// A toggle to decide if the contract has default contracts
+        /// If false, members cannot mint NFTs and join the DAO
         has_set_default_assets: bool,
     }
 
     impl DAO {
         /// The constructor of the contract.
         /// supply initial asset to the DAO
+        ///
+        /// @param token_contract, the address of NFT wizard contract
+        /// @return an instantiated DAO contract
         #[ink(constructor)]
         pub fn new(token_contract: AccountId) -> Self {
             Self {
@@ -174,12 +178,19 @@ mod dao {
             }
         }
 
+        /// This is callable by the owner(s) of the DAO (this would ideally be a multisig)
+        /// This message does not need to be voted on
+        /// It can be used to set assets owned by the DAO owners at the start of Dapp
+        ///
+        /// @param initial_assets, a list of IPFS CIDs of assets to be minted
+        /// This would be minted and owned by the DAO owners
+        /// This call would toggle the status of the has_set_default_assets to true
         #[ink(message)]
         pub fn set_default_assets(&mut self, initial_assets: Vec<ContentIdentifier>) -> Result<()> {
             assert!(self.token_contract != AccountId::from([0x0; 32]));
             let mut to_return: Result<()> = Ok(());
             for asset in initial_assets {
-                let mut result = self.execute_mint_message(self.env().caller(), asset);
+                let result = self.execute_mint_message(self.env().account_id(), asset);
                 to_return = match result {
                     true => {
                         self.has_set_default_assets = true;
@@ -207,7 +218,7 @@ mod dao {
         ) -> Result<()> {
             assert!(self.has_set_default_assets, "Must have set owner's assets");
             self.ensure_valid_cid(&proposal_cid);
-            self.ensure_new_cid(&proposal_cid)?;
+            assert!(self.ensure_new_cid(&proposal_cid).is_none());
             let caller = self.env().caller();
 
             // fetch the proposal count
@@ -371,7 +382,6 @@ mod dao {
                         // // for approval, expect a VoteType::Yes greater than 60%% vote
                         // // for rejection: if total vote < 4
                         let voters_count = vote.voters.len() as u64;
-                        assert!(voters_count > 3, "NotEnoughVotes");
                         let (votes_for, _): (u64, u64) = (
                             match vote.votes_for {
                                 Some(value) => value,
@@ -386,7 +396,7 @@ mod dao {
                             .unwrap()
                             .checked_div(voters_count.checked_mul(100).unwrap())
                             .unwrap();
-                        if percentage < 65 {
+                        if percentage < 65 || voters_count < 3 {
                             proposal.status = ProposalStatus::Rejected;
                         } else {
                             proposal.status = ProposalStatus::Approved;
@@ -429,7 +439,7 @@ mod dao {
             let account_id = self.ensure_new_cid(&asset_cid);
 
             match account_id {
-                Ok(account) => {
+                Some(account) => {
                     let burn_result = build_call::<DefaultEnvironment>()
                         .call(self.token_contract)
                         .gas_limit(0)
@@ -448,7 +458,7 @@ mod dao {
                         _ => Err(Error::TokenBurningFailed),
                     }
                 }
-                _ => Err(Error::TokenBurningFailed),
+                None => Err(Error::TokenBurningFailed),
             }
         }
 
@@ -519,13 +529,13 @@ mod dao {
         }
 
         pub fn ensure_valid_cid(&self, cid: &ContentIdentifier) {
-            assert!(cid.len() >= 10, "Invalid CID")
+            assert!(cid.len() >= 5, "Invalid CID")
         }
 
         /// Called to verify that the proposal_cid submitted is a new proposal
         /// It is sufficient to check the assets_pwned mapping
         /// @param proposal_cid: IPFS CID of the propposal
-        pub fn ensure_new_cid(&self, proposal_cid: &ContentIdentifier) -> Result<AccountId> {
+        pub fn ensure_new_cid(&self, proposal_cid: &ContentIdentifier) -> Option<AccountId> {
             let result = build_call::<DefaultEnvironment>()
                 .call(self.token_contract)
                 .gas_limit(0)
@@ -537,8 +547,8 @@ mod dao {
                 .try_invoke();
 
             match result {
-                Ok(Ok(account)) => Ok(account),
-                _ => Err(Error::InvalidAsset),
+                Ok(Ok(account)) => Some(account),
+                _ => None,
             }
         }
 

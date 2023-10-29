@@ -7,6 +7,7 @@ mod multisig {
         CallFlags,
     };
     use ink::prelude::vec::Vec;
+    use ink::selector_bytes;
     use ink::storage::traits::StorageLayout;
     use ink::storage::Mapping;
     use scale::{Decode, Encode, Output};
@@ -376,6 +377,11 @@ mod multisig {
                 result: result.clone().map(Some),
             });
             result
+        }
+
+        pub fn encode_function_name(&self) -> [u8; 4] {
+            let selector = selector_bytes!("add_owner");
+            selector
         }
 
         /// Get the index of `owner` in `self.owners`.

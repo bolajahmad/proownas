@@ -1,4 +1,5 @@
 import { CenterBody } from '@components/layout/CenterBody'
+import { CreatePropertiesView } from '@components/properties/CreatePropertiesView'
 import { PropertiesView } from '@components/properties/PropertiesView'
 import { useInkathon } from '@scio-labs/use-inkathon'
 import type { NextPage } from 'next'
@@ -19,6 +20,10 @@ const HomePage: NextPage = () => {
       <CenterBody tw="mb-10 px-5">
         <div tw="mt-20 flex w-full items-center justify-between rounded-md bg-gray-900 px-16 py-6">
           <h2 tw="font-bold text-3xl">All Properties</h2>
+
+          <div>
+            <CreatePropertiesView />
+          </div>
         </div>
 
         <PropertiesView />

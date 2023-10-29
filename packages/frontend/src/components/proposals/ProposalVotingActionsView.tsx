@@ -1,18 +1,16 @@
 import { Button, Spinner } from '@chakra-ui/react'
-import { useProownasDAOContext } from '@context/ProownasDAO'
-import { Proposal, ProposalStatus, Vote, VoteType } from '../../types/customs'
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
-import { useVoteOnProposal } from '@utils/hooks/useVoteOnProposal'
-import 'twin.macro'
+import { ContractIds } from '@deployments/deployments'
 import {
   contractQuery,
   decodeOutput,
   useInkathon,
   useRegisteredContract,
 } from '@scio-labs/use-inkathon'
-import { ContractIds } from '@deployments/deployments'
-import toast from 'react-hot-toast'
 import { contractTxWithToast } from '@utils/contractTxWithToast'
+import { Fragment, useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
+import 'twin.macro'
+import { Proposal, ProposalStatus, Vote, VoteType } from '../../types/customs'
 
 export const VoteOnProposal = ({
   handleVote,
@@ -230,6 +228,7 @@ export const CloseVoteEvent = ({ proposal }: { proposal: Proposal }) => {
       setSubmitting(true)
       await contractTxWithToast(api, activeAccount.address, contract, 'create_proposal_asset', {}, [
         proposalId,
+        proposal.proposer,
       ])
     } catch (error) {
       console.error(error)

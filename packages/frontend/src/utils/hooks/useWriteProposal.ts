@@ -19,7 +19,7 @@ export const useWriteProposal = () => {
     // send submit_new_asset message
     setSubmitting(true)
     try {
-      await contractTxWithToast(api, activeAccount.address, contract, 'submit_new_asset', {}, [
+      await contractTxWithToast(api, activeAccount.address, contract, 'submit_new_proposal', {}, [
         proposalCid,
         new Date().getTime(),
         duration,

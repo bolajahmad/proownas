@@ -1,32 +1,19 @@
-import {
-  Badge,
-  Skeleton,
-  Spinner,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from '@chakra-ui/react'
-import { Proposal, ProposalStatus } from '../../types/customs'
-import { fetchMetadataByCID, useFetchProposal } from '@utils/hooks/useSingleProposal'
-import Link from 'next/link'
-import 'twin.macro'
-import { useProownasDAOContext } from '@context/ProownasDAO'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ProposalVotingActionsView } from './ProposalVotingActionsView'
-import { truncateHash } from '@utils/truncateHash'
-import { useDAOProposal } from '@utils/hooks/useDAOProposal'
+import { Badge, Spinner, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
+import { ContractIds } from '@deployments/deployments'
 import {
   contractQuery,
   decodeOutput,
   useInkathon,
   useRegisteredContract,
 } from '@scio-labs/use-inkathon'
-import { ContractIds } from '@deployments/deployments'
+import { fetchMetadataByCID, useFetchProposal } from '@utils/hooks/useSingleProposal'
+import { truncateHash } from '@utils/truncateHash'
+import Link from 'next/link'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
+import 'twin.macro'
+import { Proposal, ProposalStatus } from '../../types/customs'
+import { ProposalVotingActionsView } from './ProposalVotingActionsView'
 
 export const ProposalById = ({ id }: { id: string }) => {
   const [selectedProposal, setProposal] = useState<Proposal>()
@@ -109,7 +96,7 @@ export const ProposalById = ({ id }: { id: string }) => {
     if (selectedProposal) fetchProposalIPFSData(selectedProposal?.proposalCid)
   }, [selectedProposal])
   const [days, hours, minutes] = useMemo(() => {
-    let timeLeft = votingDeadline * 6 // a block is approximately 3-4 seconds
+    let timeLeft = votingDeadline * 10 // a block is approximately 3-4 seconds
 
     //convert to hours
     const days = timeLeft / (60 * 60 * 24)
