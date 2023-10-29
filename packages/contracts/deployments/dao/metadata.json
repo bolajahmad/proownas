@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x8d86c172a07874fbff8f638f318cd1d65987d95f97a420931eeba6a0bac1710a",
+    "hash": "0xc77723a95add53671b216f4b873ce38b2bccfa79780a346fc519d84ab62a39e1",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -37,7 +37,10 @@
         "default": false,
         "docs": [
           "The constructor of the contract.",
-          "supply initial asset to the DAO"
+          "supply initial asset to the DAO",
+          "",
+          "@param token_contract, the address of NFT wizard contract",
+          "@return an instantiated DAO contract"
         ],
         "label": "new",
         "payable": false,
@@ -260,7 +263,15 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " This is callable by the owner(s) of the DAO (this would ideally be a multisig)",
+          " This message does not need to be voted on",
+          " It can be used to set assets owned by the DAO owners at the start of Dapp",
+          "",
+          " @param initial_assets, a list of IPFS CIDs of assets to be minted",
+          " This would be minted and owned by the DAO owners",
+          " This call would toggle the status of the has_set_default_assets to true"
+        ],
         "label": "set_default_assets",
         "mutates": true,
         "payable": false,
