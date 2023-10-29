@@ -22,7 +22,8 @@ By [Bolaji Ahmad](https://linkedin.com/in/bolajahmad) 🪄
    3. [VSCode Setup](#vscode-setup)
 3. [Customization](#customization)
 4. [Environmnent Variables](#env-variables)
-5. [FAQs \& Troubleshooting](#faqs--troubleshooting)
+5. [Roadmap](#roadmap)
+6. [FAQs \& Troubleshooting](#faqs--troubleshooting)
 
 ---
 
@@ -145,6 +146,12 @@ Please see all pre-defined environment variables below and find more info in [`p
 ### Contract Deployment
 
 Please see the [Contract Quickstart](#contracts-quickstart) section above.
+
+## Roadmap
+
+The project roadmap is discussed in the (pitchdeck)[https://youtu.be/F6LhVe9ooDs].
+
+<img src="assets/roadmap.png" width="800" height="auto" alt="The Stack of ink!athon" />
 
 ## FAQs & Troubleshooting
 
