@@ -7,8 +7,6 @@
 
 <img src="assets/DAO-contract-basic-flow.png" width="400" height="200" alt="Cover Image" />
 
----
-
 This is built on [`useInkathon` React Hooks](https://github.com/scio-labs/use-inkathon) that abstract & improve the polkadot.js experience.
 
 By [Bolaji Ahmad](https://linkedin.com/in/bolajahmad) 🪄
@@ -22,9 +20,9 @@ By [Bolaji Ahmad](https://linkedin.com/in/bolajahmad) 🪄
    1. [Start the Frontend](#frontend-quickstart)
    2. [Running the contracts](#run-the-contracts)
    3. [VSCode Setup](#vscode-setup)
-6. [Customization](#customization)
-7. [Environmnent Variables](#env-variables)
-8. [FAQs \& Troubleshooting](#faqs--troubleshooting)
+3. [Customization](#customization)
+4. [Environmnent Variables](#env-variables)
+5. [FAQs \& Troubleshooting](#faqs--troubleshooting)
 
 ---
 
@@ -46,7 +44,6 @@ By [Bolaji Ahmad](https://linkedin.com/in/bolajahmad) 🪄
 - Deployment: Vercel
 
 </details>
-
 
 ## Setup and Installation 🚨
 
@@ -77,7 +74,6 @@ Assuming you have NodeJS installed, Installed pnpm also (the project is managed 
 
 To run the frontend successfully, be sure to update the `NEXT_PUBLIC_WEB3STORAGE_TOKEN` with a token of your choice, or contact (bjahmad4tech@gmail.com)[mailto:bjahmad4tech@gmail.com]
 
-
 ### Running the contract
 
 ```bash
@@ -107,7 +103,6 @@ pnpm test
 
 ```
 
-
 ### VSCode Setup
 
 #### Workspace
@@ -132,21 +127,20 @@ I strongly recommend installing all plugins listed inside `.vscode/extensions.js
 
 </details>
 
-
 ## Environment Variables
 
-The only mandatory environment variable you need to add is `NEXT_PUBLIC_WEB3STORAGE_TOKEN`. Just set it to *_YOUR-API-KEY-FROM-WEB3STORAGE_*  as there are defaults for other values.
+The only mandatory environment variable you need to add is `NEXT_PUBLIC_WEB3STORAGE_TOKEN`. Just set it to _*YOUR-API-KEY-FROM-WEB3STORAGE*_ as there are defaults for other values.
 
 Please see all pre-defined environment variables below and find more info in [`packages/frontend/.env.local.example`](https://github.com/scio-labs/inkathon/blob/main/packages/frontend/.env.local.example). All available blockchain network identifiers are defined in the [`useInkathon` repository](https://github.com/scio-labs/use-inkathon/blob/main/src/chains.ts).
 
-| Environment Variable           | Value                          |
-| ------------------------------ | ------------------------------ |
-| `NEXT_PUBLIC_PRODUCTION_MODE`  | `true`                         |
-| `NEXT_PUBLIC_URL`              | `https://localhost:3000` |
-| `NEXT_PUBLIC_DEFAULT_CHAIN`    | `shibuya`            |
-| `NEXT_PUBLIC_SUPPORTED_CHAINS` | `["alephzero-testnet", "shibuya"]`|
-| `NEXT_PUBLIC_WEB3STORAGE_TOKEN`| `YOUR-API-KEY-FROM-WEB3STORAGE` |
-`        |
+| Environment Variable            | Value                              |
+| ------------------------------- | ---------------------------------- |
+| `NEXT_PUBLIC_PRODUCTION_MODE`   | `true`                             |
+| `NEXT_PUBLIC_URL`               | `https://localhost:3000`           |
+| `NEXT_PUBLIC_DEFAULT_CHAIN`     | `shibuya`                          |
+| `NEXT_PUBLIC_SUPPORTED_CHAINS`  | `["alephzero-testnet", "shibuya"]` |
+| `NEXT_PUBLIC_WEB3STORAGE_TOKEN` | `YOUR-API-KEY-FROM-WEB3STORAGE`    |
+| `                               |
 
 ### Contract Deployment
 
