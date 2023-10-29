@@ -189,6 +189,8 @@ mod dao {
         pub fn set_default_assets(&mut self, initial_assets: Vec<ContentIdentifier>) -> Result<()> {
             assert!(self.token_contract != AccountId::from([0x0; 32]));
             let mut to_return: Result<()> = Ok(());
+
+            // loop through provided assets and mint each of them
             for asset in initial_assets {
                 let result = self.execute_mint_message(self.env().account_id(), asset);
                 to_return = match result {
@@ -230,8 +232,9 @@ mod dao {
             self.proposals_by_account
                 .insert(&caller, &proposals_of.clone());
 
-            let duration = days.checked_mul(2_u32).unwrap();
-
+            // duration in days should be converted to block_number
+            // for simplicity and faster testing and feedbacks, this is set to 1day * 500blocks
+            let duration = days.checked_mul(500_u32).unwrap();
             let proposal = Proposal {
                 status: ProposalStatus::Pending,
                 duration,
@@ -259,7 +262,11 @@ mod dao {
         }
 
         /// Open proposal for voting
-        /// This should be done when the user is verified
+        /// This should be done when the user is part of the DAO
+        /// @param proposal_id: ID of the proposal to be activated
+        ///
+        /// This message will toggle the status of the Proposal to ProposalStatus::Ongoing
+        /// This message will initialize the Vote struct for the proposal_id
         #[ink(message)]
         pub fn activate_voting(&mut self, proposal_id: u128) -> Result<()> {
             let caller = self.env().caller();
@@ -301,12 +308,19 @@ mod dao {
             }
         }
 
+        /// message proposal to vote on proposal
+        ///
+        /// @param proposal_id: ID of the proposal to be voted on
+        /// @param vote: VoteType::Yes or VoteType::No
+        ///
+        /// Any member of the DAO can call this function
         #[ink(message)]
         pub fn vote_on_proposal(&mut self, proposal_id: u128, vote: VoteType) -> Result<()> {
             let caller = self.env().caller();
             let block_number = self.env().block_number();
-            let proposal = self.proposal_by_id.get(&proposal_id).unwrap();
 
+            // verify that proposal is still ongoing and that vote duration is not up
+            let proposal = self.proposal_by_id.get(&proposal_id).unwrap();
             let is_ongoing = match proposal.status {
                 ProposalStatus::Ongoing => true,
                 _ => false,
@@ -317,11 +331,14 @@ mod dao {
                 "ClosedProposal"
             );
 
+            // ensure that user has not already voted
             let mut existing_vote = self.votes_by_proposal.get(&proposal_id).unwrap();
             let is_existing_user = existing_vote.voters.iter().any(|v| *v == caller);
             assert!(!is_existing_user, "AlreadyVoted");
 
             existing_vote.voters.push(caller);
+
+            // cast vote
             let new_votes = match vote {
                 VoteType::Yes => {
                     let votes_for = match existing_vote.votes_for {
@@ -352,7 +369,6 @@ mod dao {
             };
 
             self.votes_by_proposal.insert(&proposal_id, &new_votes);
-
             self.env().emit_event(VoteUpdated {
                 voter: caller,
                 vote,
@@ -365,9 +381,17 @@ mod dao {
             Ok(())
         }
 
+        /// message to close voting
+        /// Any member of the DAO cann call this
+        ///
+        /// @param proposal_id: ID of the proposal to be closed
+        ///
+        /// This message will toggle proposal status to ProposalStatus::Approved or ProposalStatus::Rejected
+        /// depending on the result of the vote
         #[ink(message)]
         pub fn close_voting_period(&mut self, proposal_id: u128) -> Result<()> {
             let p = self.get_proposal_by_id(proposal_id);
+
             match p {
                 Ok(mut proposal) => match proposal.status {
                     ProposalStatus::Ongoing => {
@@ -414,6 +438,15 @@ mod dao {
             }
         }
 
+        /// message to create proposal asset | mint submitted proposal CID
+        /// This message can be called by anyone (in the future, only the multisig can call this)
+        /// This expects that proposal is approved already
+        ///
+        /// @param proposal_id: ID of the proposal to be minted
+        /// @param owner: address of the owner of the proposal
+        ///
+        /// A new token should be minted on successfull call
+        /// this should also increase the totalSupply of the NFTs
         #[ink(message)]
         pub fn create_proposal_asset(&mut self, proposal_id: u128, owner: AccountId) -> Result<()> {
             let proposals_owned = self.proposals_by_account.get(&owner).unwrap();
@@ -434,6 +467,7 @@ mod dao {
             }
         }
 
+        /// message to destroy proposal asset | burn submitted proposal CID
         #[ink(message)]
         pub fn destroy_asset(&mut self, asset_cid: ContentIdentifier) -> Result<()> {
             let account_id = self.ensure_new_cid(&asset_cid);
