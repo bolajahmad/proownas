@@ -15,19 +15,19 @@ export const getDeployments = async (): Promise<SubstrateDeployment[]> => {
         contractId: ContractIds.Dao,
         networkId: network,
         abi: await import(`@inkathon/contracts/deployments/dao/metadata.json`),
-        address: 'WBHemgUgSy3X7N6kVw4mcwFavCHPsTGGtEWzhExayLiUVV2',
+        address: 'XP2aEpgQPddzQV6zokhbJwp9vTVjNjQsHiojpF4hAYtsegL',
       },
       {
         contractId: ContractIds.PropertyToken,
         networkId: network,
         abi: await import(`@inkathon/contracts/deployments/propertytoken/metadata.json`),
-        address: 'bAPfbTiwRaY6tUf8F9UyyM4B19gt4gQgeYmWpVHJiGiDp7b',
+        address: 'YCLULSSLCDHy9rjcaHVzfMNoprxw7qVrKNudXymvBNEZFuC',
       },
       {
         contractId: ContractIds.Multisig,
         networkId: network,
         abi: await import(`@inkathon/contracts/deployments/multisig/metadata.json`),
-        address: 'WX8zrBMqAhSboR2NDJJcPEdJtnkEaEqqQzJYeeoDUDQrmiy',
+        address: 'auvCG6zefsnC8hKpTQ1F69EUAL38qxKm8XszH5M6DctksUc',
       },
     ])
     .reduce(async (acc, curr) => [...(await acc), ...(await curr)], [] as any)
