@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xc77723a95add53671b216f4b873ce38b2bccfa79780a346fc519d84ab62a39e1",
+    "hash": "0x727a1319a685b4b7de2e999c96757a60a9a2f615db92c11cb77d7f0936b0beae",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -78,13 +78,13 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 34
+        "type": 38
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 33
+        "type": 37
       },
       "maxEventTopics": 4,
       "timestamp": {
@@ -193,7 +193,7 @@
               "displayName": [
                 "VoteType"
               ],
-              "type": 17
+              "type": 16
             }
           },
           {
@@ -219,7 +219,7 @@
               "displayName": [
                 "Option"
               ],
-              "type": 20
+              "type": 19
             }
           },
           {
@@ -232,7 +232,7 @@
               "displayName": [
                 "Option"
               ],
-              "type": 20
+              "type": 19
             }
           }
         ],
@@ -253,12 +253,12 @@
       {
         "args": [
           {
-            "label": "initial_assets",
+            "label": "initial_asset",
             "type": {
               "displayName": [
-                "Vec"
+                "ContentIdentifier"
               ],
-              "type": 13
+              "type": 5
             }
           }
         ],
@@ -280,7 +280,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 14
+          "type": 13
         },
         "selector": "0x7298d592"
       },
@@ -324,7 +324,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 14
+          "type": 13
         },
         "selector": "0xa9b6109b"
       },
@@ -343,7 +343,11 @@
         "default": false,
         "docs": [
           " Open proposal for voting",
-          " This should be done when the user is verified"
+          " This should be done when the user is part of the DAO",
+          " @param proposal_id: ID of the proposal to be activated",
+          "",
+          " This message will toggle the status of the Proposal to ProposalStatus::Ongoing",
+          " This message will initialize the Vote struct for the proposal_id"
         ],
         "label": "activate_voting",
         "mutates": true,
@@ -353,7 +357,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 14
+          "type": 13
         },
         "selector": "0xd68f9f61"
       },
@@ -374,12 +378,19 @@
               "displayName": [
                 "VoteType"
               ],
-              "type": 17
+              "type": 16
             }
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " message proposal to vote on proposal",
+          "",
+          " @param proposal_id: ID of the proposal to be voted on",
+          " @param vote: VoteType::Yes or VoteType::No",
+          "",
+          " Any member of the DAO can call this function"
+        ],
         "label": "vote_on_proposal",
         "mutates": true,
         "payable": false,
@@ -388,7 +399,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 14
+          "type": 13
         },
         "selector": "0xa7072938"
       },
@@ -405,7 +416,15 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " message to close voting",
+          " Any member of the DAO cann call this",
+          "",
+          " @param proposal_id: ID of the proposal to be closed",
+          "",
+          " This message will toggle proposal status to ProposalStatus::Approved or ProposalStatus::Rejected",
+          " depending on the result of the vote"
+        ],
         "label": "close_voting_period",
         "mutates": true,
         "payable": false,
@@ -414,7 +433,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 14
+          "type": 13
         },
         "selector": "0x1d4490cb"
       },
@@ -440,7 +459,17 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " message to create proposal asset | mint submitted proposal CID",
+          " This message can be called by anyone (in the future, only the multisig can call this)",
+          " This expects that proposal is approved already",
+          "",
+          " @param proposal_id: ID of the proposal to be minted",
+          " @param owner: address of the owner of the proposal",
+          "",
+          " A new token should be minted on successfull call",
+          " this should also increase the totalSupply of the NFTs"
+        ],
         "label": "create_proposal_asset",
         "mutates": true,
         "payable": false,
@@ -449,7 +478,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 14
+          "type": 13
         },
         "selector": "0xae1a18d9"
       },
@@ -466,7 +495,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " message to destroy proposal asset | burn submitted proposal CID"
+        ],
         "label": "destroy_asset",
         "mutates": true,
         "payable": false,
@@ -475,7 +506,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 14
+          "type": 13
         },
         "selector": "0x7515848e"
       },
@@ -501,7 +532,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 17
         },
         "selector": "0x3bd64b9d"
       },
@@ -536,7 +567,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 21
+          "type": 20
         },
         "selector": "0x774f8182"
       },
@@ -578,7 +609,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 22
+          "type": 21
         },
         "selector": "0xad4a397f"
       },
@@ -604,7 +635,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 23
+          "type": 22
         },
         "selector": "0x9d880359"
       },
@@ -630,7 +661,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 27
+          "type": 26
         },
         "selector": "0x9575936f"
       },
@@ -646,7 +677,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 29
+          "type": 28
         },
         "selector": "0x63929fbf"
       },
@@ -672,7 +703,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 30
+          "type": 29
         },
         "selector": "0x81344a58"
       },
@@ -688,9 +719,35 @@
             "ink",
             "MessageResult"
           ],
-          "type": 31
+          "type": 30
         },
         "selector": "0x72ee46c2"
+      },
+      {
+        "args": [
+          {
+            "label": "args",
+            "type": {
+              "displayName": [
+                "EncodableFunctions"
+              ],
+              "type": 32
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "encode_function_name_and_input",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 34
+        },
+        "selector": "0x8a99db30"
       }
     ]
   },
@@ -1118,22 +1175,12 @@
       "id": 13,
       "type": {
         "def": {
-          "sequence": {
-            "type": 5
-          }
-        }
-      }
-    },
-    {
-      "id": 14,
-      "type": {
-        "def": {
           "variant": {
             "variants": [
               {
                 "fields": [
                   {
-                    "type": 15
+                    "type": 14
                   }
                 ],
                 "index": 0,
@@ -1154,7 +1201,7 @@
         "params": [
           {
             "name": "T",
-            "type": 15
+            "type": 14
           },
           {
             "name": "E",
@@ -1167,7 +1214,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 14,
       "type": {
         "def": {
           "variant": {
@@ -1184,7 +1231,7 @@
               {
                 "fields": [
                   {
-                    "type": 16
+                    "type": 15
                   }
                 ],
                 "index": 1,
@@ -1200,7 +1247,7 @@
           },
           {
             "name": "E",
-            "type": 16
+            "type": 15
           }
         ],
         "path": [
@@ -1209,7 +1256,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 15,
       "type": {
         "def": {
           "variant": {
@@ -1253,7 +1300,7 @@
       }
     },
     {
-      "id": 17,
+      "id": 16,
       "type": {
         "def": {
           "variant": {
@@ -1277,7 +1324,7 @@
       }
     },
     {
-      "id": 18,
+      "id": 17,
       "type": {
         "def": {
           "variant": {
@@ -1285,7 +1332,7 @@
               {
                 "fields": [
                   {
-                    "type": 19
+                    "type": 18
                   }
                 ],
                 "index": 0,
@@ -1306,7 +1353,7 @@
         "params": [
           {
             "name": "T",
-            "type": 19
+            "type": 18
           },
           {
             "name": "E",
@@ -1319,7 +1366,7 @@
       }
     },
     {
-      "id": 19,
+      "id": 18,
       "type": {
         "def": {
           "composite": {
@@ -1331,12 +1378,12 @@
               },
               {
                 "name": "votes_for",
-                "type": 20,
+                "type": 19,
                 "typeName": "Option<u64>"
               },
               {
                 "name": "votes_against",
-                "type": 20,
+                "type": 19,
                 "typeName": "Option<u64>"
               },
               {
@@ -1355,7 +1402,7 @@
       }
     },
     {
-      "id": 20,
+      "id": 19,
       "type": {
         "def": {
           "variant": {
@@ -1388,7 +1435,7 @@
       }
     },
     {
-      "id": 21,
+      "id": 20,
       "type": {
         "def": {
           "variant": {
@@ -1430,7 +1477,7 @@
       }
     },
     {
-      "id": 22,
+      "id": 21,
       "type": {
         "def": {
           "variant": {
@@ -1472,7 +1519,7 @@
       }
     },
     {
-      "id": 23,
+      "id": 22,
       "type": {
         "def": {
           "variant": {
@@ -1480,7 +1527,7 @@
               {
                 "fields": [
                   {
-                    "type": 24
+                    "type": 23
                   }
                 ],
                 "index": 0,
@@ -1501,7 +1548,7 @@
         "params": [
           {
             "name": "T",
-            "type": 24
+            "type": 23
           },
           {
             "name": "E",
@@ -1514,7 +1561,7 @@
       }
     },
     {
-      "id": 24,
+      "id": 23,
       "type": {
         "def": {
           "variant": {
@@ -1522,7 +1569,7 @@
               {
                 "fields": [
                   {
-                    "type": 25
+                    "type": 24
                   }
                 ],
                 "index": 0,
@@ -1531,7 +1578,7 @@
               {
                 "fields": [
                   {
-                    "type": 16
+                    "type": 15
                   }
                 ],
                 "index": 1,
@@ -1543,11 +1590,11 @@
         "params": [
           {
             "name": "T",
-            "type": 25
+            "type": 24
           },
           {
             "name": "E",
-            "type": 16
+            "type": 15
           }
         ],
         "path": [
@@ -1556,14 +1603,14 @@
       }
     },
     {
-      "id": 25,
+      "id": 24,
       "type": {
         "def": {
           "composite": {
             "fields": [
               {
                 "name": "status",
-                "type": 26,
+                "type": 25,
                 "typeName": "ProposalStatus"
               },
               {
@@ -1607,7 +1654,7 @@
       }
     },
     {
-      "id": 26,
+      "id": 25,
       "type": {
         "def": {
           "variant": {
@@ -1639,7 +1686,7 @@
       }
     },
     {
-      "id": 27,
+      "id": 26,
       "type": {
         "def": {
           "variant": {
@@ -1647,7 +1694,7 @@
               {
                 "fields": [
                   {
-                    "type": 28
+                    "type": 27
                   }
                 ],
                 "index": 0,
@@ -1668,7 +1715,7 @@
         "params": [
           {
             "name": "T",
-            "type": 28
+            "type": 27
           },
           {
             "name": "E",
@@ -1681,7 +1728,7 @@
       }
     },
     {
-      "id": 28,
+      "id": 27,
       "type": {
         "def": {
           "variant": {
@@ -1698,7 +1745,7 @@
               {
                 "fields": [
                   {
-                    "type": 16
+                    "type": 15
                   }
                 ],
                 "index": 1,
@@ -1714,7 +1761,7 @@
           },
           {
             "name": "E",
-            "type": 16
+            "type": 15
           }
         ],
         "path": [
@@ -1723,7 +1770,7 @@
       }
     },
     {
-      "id": 29,
+      "id": 28,
       "type": {
         "def": {
           "variant": {
@@ -1765,7 +1812,7 @@
       }
     },
     {
-      "id": 30,
+      "id": 29,
       "type": {
         "def": {
           "variant": {
@@ -1807,7 +1854,7 @@
       }
     },
     {
-      "id": 31,
+      "id": 30,
       "type": {
         "def": {
           "variant": {
@@ -1815,7 +1862,7 @@
               {
                 "fields": [
                   {
-                    "type": 32
+                    "type": 31
                   }
                 ],
                 "index": 0,
@@ -1836,7 +1883,7 @@
         "params": [
           {
             "name": "T",
-            "type": 32
+            "type": 31
           },
           {
             "name": "E",
@@ -1849,7 +1896,7 @@
       }
     },
     {
-      "id": 32,
+      "id": 31,
       "type": {
         "def": {
           "tuple": [
@@ -1860,7 +1907,158 @@
       }
     },
     {
+      "id": 32,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 5,
+                    "typeName": "Vec<u8>"
+                  }
+                ],
+                "index": 0,
+                "name": "SetAsset"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 5,
+                    "typeName": "Vec<u8>"
+                  }
+                ],
+                "index": 1,
+                "name": "ActivateVoting"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 5,
+                    "typeName": "Vec<u8>"
+                  }
+                ],
+                "index": 2,
+                "name": "CloseVoting"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 1,
+                    "typeName": "AccountId"
+                  }
+                ],
+                "index": 3,
+                "name": "SetTokenContract"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 5,
+                    "typeName": "Vec<u8>"
+                  }
+                ],
+                "index": 4,
+                "name": "DestroyAsset"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 33,
+                    "typeName": "(u128, AccountId)"
+                  }
+                ],
+                "index": 5,
+                "name": "CreateProposalAsset"
+              }
+            ]
+          }
+        },
+        "path": [
+          "dao",
+          "dao",
+          "EncodableFunctions"
+        ]
+      }
+    },
+    {
       "id": 33,
+      "type": {
+        "def": {
+          "tuple": [
+            6,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": 34,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 35
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 35
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 35,
+      "type": {
+        "def": {
+          "tuple": [
+            36,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "id": 36,
+      "type": {
+        "def": {
+          "array": {
+            "len": 4,
+            "type": 3
+          }
+        }
+      }
+    },
+    {
+      "id": 37,
       "type": {
         "def": {
           "composite": {
@@ -1880,7 +2078,7 @@
       }
     },
     {
-      "id": 34,
+      "id": 38,
       "type": {
         "def": {
           "variant": {}

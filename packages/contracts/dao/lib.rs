@@ -2,7 +2,7 @@
 
 #[ink::contract]
 mod dao {
-    use ink::env::call::{build_call, ExecutionInput, Selector};
+    use ink::env::call::{build_call, utils::ArgumentList, ExecutionInput, Selector};
     use ink::env::DefaultEnvironment;
     use ink::prelude::vec::Vec;
     use ink::storage::traits::StorageLayout;
@@ -70,6 +70,24 @@ mod dao {
         Approved,
         /// Status of a rejected proposal.
         Rejected,
+    }
+
+    /// An enum representing the list of encodable functions
+    /// These functions can be encoded, arguments included, and passed as argument to Multisig
+    #[derive(Encode, Decode)]
+    #[cfg_attr(
+        feature = "std",
+        derive(Debug, PartialEq, Eq, scale_info::TypeInfo, StorageLayout,)
+    )]
+    pub enum EncodableFunctions {
+        // Encode the Self::set_default_asset implementation
+        // Associated value is the IPFS CID of the asset
+        SetAsset(Vec<u8>),
+        ActivateVoting(Vec<u8>),
+        CloseVoting(Vec<u8>),
+        SetTokenContract(AccountId),
+        DestroyAsset(Vec<u8>),
+        CreateProposalAsset((u128, AccountId)),
     }
 
     /// The specified and allowed vote types
@@ -186,23 +204,17 @@ mod dao {
         /// This would be minted and owned by the DAO owners
         /// This call would toggle the status of the has_set_default_assets to true
         #[ink(message)]
-        pub fn set_default_assets(&mut self, initial_assets: Vec<ContentIdentifier>) -> Result<()> {
+        pub fn set_default_assets(&mut self, initial_asset: ContentIdentifier) -> Result<()> {
             assert!(self.token_contract != AccountId::from([0x0; 32]));
-            let mut to_return: Result<()> = Ok(());
 
-            // loop through provided assets and mint each of them
-            for asset in initial_assets {
-                let result = self.execute_mint_message(self.env().account_id(), asset);
-                to_return = match result {
-                    true => {
-                        self.has_set_default_assets = true;
-                        Ok(())
-                    }
-                    false => Err(Error::TokenMintingFailed),
-                };
+            let result = self.execute_mint_message(self.env().account_id(), initial_asset);
+            match result {
+                true => {
+                    self.has_set_default_assets = true;
+                    Ok(())
+                }
+                false => Err(Error::TokenMintingFailed),
             }
-
-            to_return
         }
 
         /* Submit a new proposal to the DAO
@@ -562,6 +574,55 @@ mod dao {
             (all_users.clone(), length)
         }
 
+        #[ink(message)]
+        pub fn encode_function_name_and_input(
+            &self,
+            args: EncodableFunctions,
+        ) -> ([u8; 4], Vec<u8>) {
+            match args {
+                EncodableFunctions::SetAsset(cids) => {
+                    // let mut content: Vec<ContentIdentifier> = Vec::new();
+                    // content.push("".into());
+                    let encoded_name = ink::selector_bytes!("set_default_assets");
+                    let inputs = ArgumentList::empty().push_arg(&cids);
+                    let encoded_inputs = inputs.encode();
+                    (encoded_name, encoded_inputs)
+                }
+                EncodableFunctions::ActivateVoting(proposal_id) => {
+                    let encoded_name = ink::selector_bytes!("activate_voting");
+                    let inputs = ArgumentList::empty().push_arg(&proposal_id);
+                    let encoded_inputs = inputs.encode();
+                    (encoded_name, encoded_inputs)
+                }
+                EncodableFunctions::CloseVoting(proposal_id) => {
+                    let encoded_name = ink::selector_bytes!("close_voting_period");
+                    let inputs = ArgumentList::empty().push_arg(&proposal_id);
+                    let encoded_inputs = inputs.encode();
+                    (encoded_name, encoded_inputs)
+                }
+                EncodableFunctions::DestroyAsset(cid) => {
+                    let encoded_name = ink::selector_bytes!("destroy_asset");
+                    let inputs = ArgumentList::empty().push_arg(&cid);
+                    let encoded_inputs = inputs.encode();
+                    (encoded_name, encoded_inputs)
+                }
+                EncodableFunctions::SetTokenContract(contract_id) => {
+                    let encoded_name = ink::selector_bytes!("set_token_contract");
+                    let inputs = ArgumentList::empty().push_arg(&contract_id);
+                    let encoded_inputs = inputs.encode();
+                    (encoded_name, encoded_inputs)
+                }
+                EncodableFunctions::CreateProposalAsset((proposal_id, owner)) => {
+                    let encoded_name = ink::selector_bytes!("create_proposal_asset");
+                    let inputs = ArgumentList::empty()
+                        .push_arg(&proposal_id)
+                        .push_arg(&owner);
+                    let encoded_inputs = inputs.encode();
+                    (encoded_name, encoded_inputs)
+                }
+            }
+        }
+
         pub fn ensure_valid_cid(&self, cid: &ContentIdentifier) {
             assert!(cid.len() >= 5, "Invalid CID")
         }
@@ -624,9 +685,9 @@ mod dao {
             }
         }
     }
-    // #[cfg(test)]
-    // mod tests {
-    //     use super::*;
 
-    // }
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+    }
 }

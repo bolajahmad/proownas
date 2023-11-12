@@ -7,7 +7,6 @@ mod multisig {
         CallFlags,
     };
     use ink::prelude::vec::Vec;
-    use ink::selector_bytes;
     use ink::storage::traits::StorageLayout;
     use ink::storage::Mapping;
     use scale::{Decode, Encode, Output};
@@ -265,7 +264,8 @@ mod multisig {
             transaction: Transaction,
         ) -> (TransactionId, ConfirmationStatus) {
             self.ensure_caller_is_owner();
-            let trans_id = self.transaction_list.next_id;
+            let mut trans_id = self.transaction_list.next_id;
+            trans_id = trans_id.checked_add(1).expect("Transaction ids exhausted.");
             self.transaction_list.next_id =
                 trans_id.checked_add(1).expect("Transaction ids exhausted.");
             self.transactions.insert(trans_id, &transaction);
@@ -273,6 +273,7 @@ mod multisig {
             self.env().emit_event(Submission {
                 transaction: trans_id,
             });
+
             (
                 trans_id,
                 self.confirm_by_caller(self.env().caller(), trans_id),
@@ -377,11 +378,6 @@ mod multisig {
                 result: result.clone().map(Some),
             });
             result
-        }
-
-        pub fn encode_function_name(&self) -> [u8; 4] {
-            let selector = selector_bytes!("add_owner");
-            selector
         }
 
         /// Get the index of `owner` in `self.owners`.
