@@ -4,6 +4,7 @@ import { makeWeb3StorageClient } from '@config/getSupportedChains'
 import { ContractIds } from '@deployments/deployments'
 import { Dialog } from '@headlessui/react'
 import { useInkathon, useRegisteredContract } from '@scio-labs/use-inkathon'
+import { contractTxWithToast } from '@utils/contractTxWithToast'
 import { Fragment, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -111,17 +112,17 @@ const PropertiesDetailForm = ({
 
     console.log({ proposalCID })
     // send submit_new_asset message
-    // setSubmitting(true)
-    // try {
-    //   await contractTxWithToast(api, activeAccount.address, contract, 'set_default_assets', {}, [
-    //     [proposalCID],
-    //   ])
-    // } catch (error) {
-    //   console.error(error)
-    //   throw error
-    // } finally {
-    //   setSubmitting(false)
-    // }
+    setSubmitting(true)
+    try {
+      await contractTxWithToast(api, activeAccount.address, contract, 'set_default_assets', {}, [
+        [proposalCID],
+      ])
+    } catch (error) {
+      console.error(error)
+      throw error
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (

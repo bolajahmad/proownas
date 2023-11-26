@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x050fe231c9eb8fa37d26a14e06c052e46f0c0c26b2b793e9a438e81b36cbe405",
+    "hash": "0xc203b33b835cbbb4aefc9c696ce6203d87f3092f583994226656cdb8df06b44e",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.70.0",
     "build_info": {
@@ -81,13 +81,13 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 29
+        "type": 32
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 28
+        "type": 31
       },
       "maxEventTopics": 4,
       "timestamp": {
@@ -193,6 +193,26 @@
               ],
               "type": 1
             }
+          },
+          {
+            "docs": [],
+            "indexed": true,
+            "label": "callee",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "name",
+            "type": {
+              "displayName": [],
+              "type": 16
+            }
           }
         ],
         "docs": [
@@ -249,7 +269,7 @@
               "displayName": [
                 "Result"
               ],
-              "type": 26
+              "type": 29
             }
           }
         ],
@@ -272,6 +292,19 @@
               ],
               "type": 2
             }
+          },
+          {
+            "docs": [
+              " The block number where owner was added"
+            ],
+            "indexed": false,
+            "label": "when",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 1
+            }
           }
         ],
         "docs": [
@@ -292,6 +325,19 @@
                 "AccountId"
               ],
               "type": 2
+            }
+          },
+          {
+            "docs": [
+              " The block number where owner was removed"
+            ],
+            "indexed": false,
+            "label": "when",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 1
             }
           }
         ],
@@ -579,6 +625,32 @@
       {
         "args": [
           {
+            "label": "args",
+            "type": {
+              "displayName": [
+                "EncodableFunctions"
+              ],
+              "type": 21
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "encode_function_name_and_input",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 22
+        },
+        "selector": "0x8a99db30"
+      },
+      {
+        "args": [
+          {
             "label": "trans_id",
             "type": {
               "displayName": [
@@ -598,7 +670,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 21
+          "type": 24
         },
         "selector": "0x3cd4b36d"
       },
@@ -624,7 +696,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 24
+          "type": 27
         },
         "selector": "0xda9878fb"
       }
@@ -1220,7 +1292,53 @@
               {
                 "fields": [
                   {
-                    "type": 22
+                    "type": 2,
+                    "typeName": "AccountId"
+                  }
+                ],
+                "index": 0,
+                "name": "AddOwner"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 2,
+                    "typeName": "AccountId"
+                  }
+                ],
+                "index": 1,
+                "name": "RemoveOwner"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 1,
+                    "typeName": "u32"
+                  }
+                ],
+                "index": 2,
+                "name": "Invoke"
+              }
+            ]
+          }
+        },
+        "path": [
+          "multisig",
+          "multisig",
+          "EncodableFunctions"
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 23
                   }
                 ],
                 "index": 0,
@@ -1241,7 +1359,7 @@
         "params": [
           {
             "name": "T",
-            "type": 22
+            "type": 23
           },
           {
             "name": "E",
@@ -1254,65 +1372,14 @@
       }
     },
     {
-      "id": 22,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 0
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 23
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 0
-          },
-          {
-            "name": "E",
-            "type": 23
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
       "id": 23,
       "type": {
         "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "TransactionFailed"
-              }
-            ]
-          }
-        },
-        "path": [
-          "multisig",
-          "multisig",
-          "Error"
-        ]
+          "tuple": [
+            16,
+            5
+          ]
+        }
       }
     },
     {
@@ -1366,6 +1433,110 @@
               {
                 "fields": [
                   {
+                    "type": 0
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 26
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          },
+          {
+            "name": "E",
+            "type": 26
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 26,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "TransactionFailed"
+              }
+            ]
+          }
+        },
+        "path": [
+          "multisig",
+          "multisig",
+          "Error"
+        ]
+      }
+    },
+    {
+      "id": 27,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 28
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 28
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 28,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
                     "type": 5
                   }
                 ],
@@ -1375,7 +1546,7 @@
               {
                 "fields": [
                   {
-                    "type": 23
+                    "type": 26
                   }
                 ],
                 "index": 1,
@@ -1391,7 +1562,7 @@
           },
           {
             "name": "E",
-            "type": 23
+            "type": 26
           }
         ],
         "path": [
@@ -1400,7 +1571,7 @@
       }
     },
     {
-      "id": 26,
+      "id": 29,
       "type": {
         "def": {
           "variant": {
@@ -1408,7 +1579,7 @@
               {
                 "fields": [
                   {
-                    "type": 27
+                    "type": 30
                   }
                 ],
                 "index": 0,
@@ -1417,7 +1588,7 @@
               {
                 "fields": [
                   {
-                    "type": 23
+                    "type": 26
                   }
                 ],
                 "index": 1,
@@ -1429,11 +1600,11 @@
         "params": [
           {
             "name": "T",
-            "type": 27
+            "type": 30
           },
           {
             "name": "E",
-            "type": 23
+            "type": 26
           }
         ],
         "path": [
@@ -1442,7 +1613,7 @@
       }
     },
     {
-      "id": 27,
+      "id": 30,
       "type": {
         "def": {
           "variant": {
@@ -1475,7 +1646,7 @@
       }
     },
     {
-      "id": 28,
+      "id": 31,
       "type": {
         "def": {
           "composite": {
@@ -1495,7 +1666,7 @@
       }
     },
     {
-      "id": 29,
+      "id": 32,
       "type": {
         "def": {
           "variant": {}
