@@ -83,9 +83,10 @@ mod dao {
         // Encode the Self::set_default_asset implementation
         // Associated value is the IPFS CID of the asset
         SetAsset(Vec<u8>),
-        ActivateVoting(Vec<u8>),
-        CloseVoting(Vec<u8>),
+        ActivateVoting(u128),
+        CloseVoting(u128),
         SetTokenContract(AccountId),
+        SetMultisigContract(AccountId),
         DestroyAsset(Vec<u8>),
         CreateProposalAsset((u128, AccountId)),
     }
@@ -172,6 +173,8 @@ mod dao {
         /// The address of the PSP34 contract that is
         /// responsible for minting and burning new assets
         token_contract: AccountId,
+        /// The address of the Multisig contract
+        multisig_contract: AccountId,
         /// A toggle to decide if the contract has default contracts
         /// If false, members cannot mint NFTs and join the DAO
         has_set_default_assets: bool,
@@ -184,7 +187,7 @@ mod dao {
         /// @param token_contract, the address of NFT wizard contract
         /// @return an instantiated DAO contract
         #[ink(constructor)]
-        pub fn new(token_contract: AccountId) -> Self {
+        pub fn new(token_contract: AccountId, multisig_contract: AccountId) -> Self {
             Self {
                 proposal_by_id: Mapping::new(),
                 users: Vec::new(),
@@ -192,12 +195,12 @@ mod dao {
                 proposal_count: 0,
                 votes_by_proposal: Mapping::new(),
                 token_contract,
+                multisig_contract,
                 has_set_default_assets: false,
             }
         }
 
-        /// This is callable by the owner(s) of the DAO (this would ideally be a multisig)
-        /// This message does not need to be voted on
+        /// This is callable by the multisig_contract
         /// It can be used to set assets owned by the DAO owners at the start of Dapp
         ///
         /// @param initial_assets, a list of IPFS CIDs of assets to be minted
@@ -205,6 +208,11 @@ mod dao {
         /// This call would toggle the status of the has_set_default_assets to true
         #[ink(message)]
         pub fn set_default_assets(&mut self, initial_asset: ContentIdentifier) -> Result<()> {
+            assert_eq!(
+                self.env().caller(),
+                self.multisig_contract,
+                "Only Multisig allowed"
+            );
             assert!(self.token_contract != AccountId::from([0x0; 32]));
 
             let result = self.execute_mint_message(self.env().account_id(), initial_asset);
@@ -274,6 +282,9 @@ mod dao {
         }
 
         /// Open proposal for voting
+        ///
+        /// Must be called by multisig_contract
+        ///
         /// This should be done when the user is part of the DAO
         /// @param proposal_id: ID of the proposal to be activated
         ///
@@ -281,16 +292,17 @@ mod dao {
         /// This message will initialize the Vote struct for the proposal_id
         #[ink(message)]
         pub fn activate_voting(&mut self, proposal_id: u128) -> Result<()> {
-            let caller = self.env().caller();
-            assert!(proposal_id <= self.proposal_count, "Invalid Proposal ID");
-            let proposal_option = self.proposal_by_id.get(&proposal_id);
+            self.ensure_multisig();
 
+            let proposal_option = self.proposal_by_id.get(&proposal_id);
             if let Some(mut proposal) = proposal_option {
                 self.ensure_pending_proposal(&proposal);
 
-                let caller_proposals = self.ensure_is_member(&caller);
+                let caller_proposals = self
+                    .proposals_by_account
+                    .get(&proposal.proposer)
+                    .expect("Should be a DAO member");
                 let current_proposal = caller_proposals.iter().any(|p| *p == proposal_id);
-
                 if current_proposal {
                     proposal.status = ProposalStatus::Ongoing;
                     self.proposal_by_id.insert(&proposal_id, &proposal);
@@ -305,7 +317,7 @@ mod dao {
                     );
 
                     self.env().emit_event(ProposalUpdated {
-                        owner: caller,
+                        owner: proposal.proposer,
                         proposal_cid: proposal.proposal_cid,
                         proposal_id,
                         updated_at: self.env().block_number(),
@@ -330,6 +342,7 @@ mod dao {
         pub fn vote_on_proposal(&mut self, proposal_id: u128, vote: VoteType) -> Result<()> {
             let caller = self.env().caller();
             let block_number = self.env().block_number();
+            self.ensure_is_member(&caller);
 
             // verify that proposal is still ongoing and that vote duration is not up
             let proposal = self.proposal_by_id.get(&proposal_id).unwrap();
@@ -345,9 +358,8 @@ mod dao {
 
             // ensure that user has not already voted
             let mut existing_vote = self.votes_by_proposal.get(&proposal_id).unwrap();
-            let is_existing_user = existing_vote.voters.iter().any(|v| *v == caller);
-            assert!(!is_existing_user, "AlreadyVoted");
-
+            let user_vote_exists = existing_vote.voters.iter().any(|v| *v == caller);
+            assert!(!user_vote_exists, "AlreadyVoted");
             existing_vote.voters.push(caller);
 
             // cast vote
@@ -461,6 +473,7 @@ mod dao {
         /// this should also increase the totalSupply of the NFTs
         #[ink(message)]
         pub fn create_proposal_asset(&mut self, proposal_id: u128, owner: AccountId) -> Result<()> {
+            self.ensure_multisig();
             let proposals_owned = self.proposals_by_account.get(&owner).unwrap();
             let proposal_exists = proposals_owned.iter().any(|p| *p == proposal_id);
             let current_proposal = self.proposal_by_id.get(&proposal_id).unwrap();
@@ -482,6 +495,7 @@ mod dao {
         /// message to destroy proposal asset | burn submitted proposal CID
         #[ink(message)]
         pub fn destroy_asset(&mut self, asset_cid: ContentIdentifier) -> Result<()> {
+            self.ensure_multisig();
             let account_id = self.ensure_new_cid(&asset_cid);
 
             match account_id {
@@ -523,12 +537,18 @@ mod dao {
 
         #[ink(message)]
         pub fn set_token_contract(&mut self, token_contract: AccountId) {
+            self.ensure_multisig();
             self.token_contract = token_contract;
         }
 
         #[ink(message)]
         pub fn get_token_contract(&self) -> AccountId {
             self.token_contract
+        }
+
+        #[ink(message)]
+        pub fn get_multisig_contract(&self) -> AccountId {
+            self.multisig_contract
         }
 
         #[ink(message)]
@@ -612,6 +632,12 @@ mod dao {
                     let encoded_inputs = inputs.encode();
                     (encoded_name, encoded_inputs)
                 }
+                EncodableFunctions::SetMultisigContract(contract_id) => {
+                    let encoded_name = ink::selector_bytes!("set_multisig_contract");
+                    let inputs = ArgumentList::empty().push_arg(&contract_id);
+                    let encoded_inputs = inputs.encode();
+                    (encoded_name, encoded_inputs)
+                }
                 EncodableFunctions::CreateProposalAsset((proposal_id, owner)) => {
                     let encoded_name = ink::selector_bytes!("create_proposal_asset");
                     let inputs = ArgumentList::empty()
@@ -653,6 +679,11 @@ mod dao {
                 .get(&account)
                 .expect("Should be a DAO member");
             caller_proposals
+        }
+
+        pub fn ensure_multisig(&self) {
+            let caller = self.env().caller();
+            assert_eq!(caller, self.multisig_contract, "Only Multisig allowed");
         }
 
         pub fn ensure_pending_proposal(&self, proposal: &Proposal) {

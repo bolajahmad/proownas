@@ -1,8 +1,8 @@
 {
   "source": {
-    "hash": "0x727a1319a685b4b7de2e999c96757a60a9a2f615db92c11cb77d7f0936b0beae",
+    "hash": "0x44dd88f31b68ae937786374dd4d5d6950d233238525a5f705fe5bf99e228afa5",
     "language": "ink! 4.3.0",
-    "compiler": "rustc 1.69.0",
+    "compiler": "rustc 1.70.0",
     "build_info": {
       "build_mode": "Release",
       "cargo_contract_version": "3.0.1",
@@ -26,6 +26,15 @@
         "args": [
           {
             "label": "token_contract",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 1
+            }
+          },
+          {
+            "label": "multisig_contract",
             "type": {
               "displayName": [
                 "AccountId"
@@ -264,8 +273,7 @@
         ],
         "default": false,
         "docs": [
-          " This is callable by the owner(s) of the DAO (this would ideally be a multisig)",
-          " This message does not need to be voted on",
+          " This is callable by the multisig_contract",
           " It can be used to set assets owned by the DAO owners at the start of Dapp",
           "",
           " @param initial_assets, a list of IPFS CIDs of assets to be minted",
@@ -343,6 +351,9 @@
         "default": false,
         "docs": [
           " Open proposal for voting",
+          "",
+          " Must be called by multisig_contract",
+          "",
           " This should be done when the user is part of the DAO",
           " @param proposal_id: ID of the proposal to be activated",
           "",
@@ -612,6 +623,22 @@
           "type": 21
         },
         "selector": "0xad4a397f"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "get_multisig_contract",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 21
+        },
+        "selector": "0xfef5724a"
       },
       {
         "args": [
@@ -983,6 +1010,15 @@
                 }
               },
               "name": "token_contract"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 1
+                }
+              },
+              "name": "multisig_contract"
             },
             {
               "layout": {
@@ -1925,8 +1961,8 @@
               {
                 "fields": [
                   {
-                    "type": 5,
-                    "typeName": "Vec<u8>"
+                    "type": 6,
+                    "typeName": "u128"
                   }
                 ],
                 "index": 1,
@@ -1935,8 +1971,8 @@
               {
                 "fields": [
                   {
-                    "type": 5,
-                    "typeName": "Vec<u8>"
+                    "type": 6,
+                    "typeName": "u128"
                   }
                 ],
                 "index": 2,
@@ -1955,11 +1991,21 @@
               {
                 "fields": [
                   {
+                    "type": 1,
+                    "typeName": "AccountId"
+                  }
+                ],
+                "index": 4,
+                "name": "SetMultisigContract"
+              },
+              {
+                "fields": [
+                  {
                     "type": 5,
                     "typeName": "Vec<u8>"
                   }
                 ],
-                "index": 4,
+                "index": 5,
                 "name": "DestroyAsset"
               },
               {
@@ -1969,7 +2015,7 @@
                     "typeName": "(u128, AccountId)"
                   }
                 ],
-                "index": 5,
+                "index": 6,
                 "name": "CreateProposalAsset"
               }
             ]

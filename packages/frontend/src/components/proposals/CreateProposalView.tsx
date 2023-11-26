@@ -3,7 +3,7 @@ import { TextArea, TextInput } from '@components/utils/InputArea'
 import { makeWeb3StorageClient } from '@config/getSupportedChains'
 import { Dialog } from '@headlessui/react'
 import { useWriteProposal } from '@utils/hooks/useWriteProposal'
-import React, { Fragment, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AiOutlinePlusCircle } from 'react-icons/ai'
 import { FiPlus, FiX } from 'react-icons/fi'
@@ -100,6 +100,7 @@ const ProposalDetailForm = ({
     const proposal_files = [new File([proposal_blob], `proposal.json`)]
     const proposalCID = await client.put(proposal_files)
 
+    console.log({ proposalCID })
     createProposal(proposalCID, values.duration).then(() => onComplete())
   }
 

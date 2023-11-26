@@ -56,3 +56,31 @@ This is the powerhouse PSP34 token contract that manages the minting and burning
 ### The Multisig contract
 
 The multisig is borrowed from the list of ink-examples, the multisig contract. Refer to the (Multisig contract example)[https://github.com/paritytech/ink-examples/blob/main/multisig/lib.rs] by the parity tea. This Multisig is based totally on it with adjustment to the retrieve_owners function.
+
+### Overall Architecture
+
+Upload each smart contract in the following order;
+
+1 propertytoken now referred to as wizard
+1 multisig
+3 dao; because it requires the wizard and multisig during instantiation.
+
+Steps for testing
+
+- Be sure to transfer ownership of wizard to dao as a first step.
+- Submit a transaction on the Multisig to SetAsset on the DAO. This should increase the totalSupply of the wizard token(s)
+
+### Sample Data
+
+Initial asset(s) | [bafybeib7onoicg3l7cs5qvl65wfzq4hqbvf4xb32zc5zftfapb63v3kzvq,]
+
+SetAsset
+[
+'0x7298d592',
+'0xec6261667962656962376f6e6f696367336c3763733571766c363577667a7134687162766634786233327a63357a667466617062363376336b7a7671',
+]
+
+[
+'0xd68f9f61',
+'0x01000000000000000000000000000000',
+]

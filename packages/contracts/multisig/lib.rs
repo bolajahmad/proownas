@@ -3,13 +3,26 @@
 #[ink::contract]
 mod multisig {
     use ink::env::{
-        call::{build_call, ExecutionInput},
+        call::{build_call, utils::ArgumentList, ExecutionInput},
         CallFlags,
     };
     use ink::prelude::vec::Vec;
     use ink::storage::traits::StorageLayout;
     use ink::storage::Mapping;
     use scale::{Decode, Encode, Output};
+
+    /// An enum representing the list of encodable functions
+    /// These functions can be encoded, arguments included, and used to build the Transaction struct
+    #[derive(scale::Encode, scale::Decode)]
+    #[cfg_attr(
+        feature = "std",
+        derive(Debug, PartialEq, Eq, scale_info::TypeInfo, StorageLayout,)
+    )]
+    pub enum EncodableFunctions {
+        AddOwner(AccountId),
+        RemoveOwner(AccountId),
+        Invoke(u32),
+    }
 
     type TransactionId = u32;
     const MAX_OWNERS: u8 = 50;
@@ -59,6 +72,9 @@ mod multisig {
         /// The transaction that was submitted.
         #[ink(topic)]
         transaction: TransactionId,
+        #[ink(topic)]
+        callee: AccountId,
+        name: [u8; 4],
     }
 
     /// Emitted when a transaction was canceled.
@@ -89,6 +105,8 @@ mod multisig {
         /// The owner that was added.
         #[ink(topic)]
         owner: AccountId,
+        /// The block number where owner was added
+        when: u32,
     }
 
     /// Emitted when an owner is removed from the wallet.
@@ -97,6 +115,8 @@ mod multisig {
         /// The owner that was removed.
         #[ink(topic)]
         owner: AccountId,
+        /// The block number where owner was removed
+        when: u32,
     }
 
     /// Emitted when the requirement changed.
@@ -207,7 +227,10 @@ mod multisig {
             ensure_requirement_is_valid(self.owners.len() as u32 + 1, self.requirement);
             self.is_owner.insert(new_owner, &());
             self.owners.push(new_owner);
-            self.env().emit_event(OwnerAddition { owner: new_owner });
+            self.env().emit_event(OwnerAddition {
+                owner: new_owner,
+                when: self.env().block_number(),
+            });
         }
 
         #[ink(message)]
@@ -227,7 +250,10 @@ mod multisig {
             self.is_owner.remove(owner);
             self.requirement = requirement;
             self.clean_owner_confirmations(&owner);
-            self.env().emit_event(OwnerRemoval { owner });
+            self.env().emit_event(OwnerRemoval {
+                owner,
+                when: self.env().block_number(),
+            });
         }
 
         #[ink(message)]
@@ -240,8 +266,14 @@ mod multisig {
             self.is_owner.remove(old_owner);
             self.is_owner.insert(new_owner, &());
             self.clean_owner_confirmations(&old_owner);
-            self.env().emit_event(OwnerRemoval { owner: old_owner });
-            self.env().emit_event(OwnerAddition { owner: new_owner });
+            self.env().emit_event(OwnerRemoval {
+                owner: old_owner,
+                when: self.env().block_number(),
+            });
+            self.env().emit_event(OwnerAddition {
+                owner: new_owner,
+                when: self.env().block_number(),
+            });
         }
 
         #[ink(message)]
@@ -264,14 +296,15 @@ mod multisig {
             transaction: Transaction,
         ) -> (TransactionId, ConfirmationStatus) {
             self.ensure_caller_is_owner();
-            let mut trans_id = self.transaction_list.next_id;
-            trans_id = trans_id.checked_add(1).expect("Transaction ids exhausted.");
+            let trans_id = self.transaction_list.next_id;
             self.transaction_list.next_id =
                 trans_id.checked_add(1).expect("Transaction ids exhausted.");
             self.transactions.insert(trans_id, &transaction);
             self.transaction_list.transactions.push(trans_id);
             self.env().emit_event(Submission {
                 transaction: trans_id,
+                callee: transaction.callee,
+                name: transaction.selector,
             });
 
             (
@@ -322,6 +355,35 @@ mod multisig {
                     transaction: trans_id,
                     from: caller,
                 });
+            }
+        }
+
+        #[ink(message)]
+        pub fn encode_function_name_and_input(
+            &self,
+            args: EncodableFunctions,
+        ) -> ([u8; 4], Vec<u8>) {
+            match args {
+                EncodableFunctions::AddOwner(account) => {
+                    // let mut content: Vec<ContentIdentifier> = Vec::new();
+                    // content.push("".into());
+                    let encoded_name = ink::selector_bytes!("add_owner");
+                    let inputs = ArgumentList::empty().push_arg(&account);
+                    let encoded_inputs = inputs.encode();
+                    (encoded_name, encoded_inputs)
+                }
+                EncodableFunctions::RemoveOwner(account) => {
+                    let encoded_name = ink::selector_bytes!("remove_owner");
+                    let inputs = ArgumentList::empty().push_arg(&account);
+                    let encoded_inputs = inputs.encode();
+                    (encoded_name, encoded_inputs)
+                }
+                EncodableFunctions::Invoke(trans_id) => {
+                    let encoded_name = ink::selector_bytes!("invoke_transaction");
+                    let inputs = ArgumentList::empty().push_arg(&trans_id);
+                    let encoded_inputs = inputs.encode();
+                    (encoded_name, encoded_inputs)
+                }
             }
         }
 
