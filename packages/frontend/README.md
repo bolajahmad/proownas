@@ -1,26 +1,36 @@
-## Frontend Demo
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-The frontend is made up of 4 pages
+## Getting Started
 
-- Dashboard | Homepage: Shows some basic stats and should also contain quick links to settings feature (_coming soon!_).
+First, run the development server:
 
- <img src="public/images/proownas-hp-screenshot.png" width="auto" height="300" alt="Home|dashboard page" />
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-- Proposals page: On this page, user can see the list of proposals and also filter by their status. This also has a modal that can be used to create new proposals.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-<div style="display:flex;align-items:stretch;gap:10px;">
-    <img src="public/images/proownas-pp-screenshot.png" width="auto" height="300" alt="Proposals pagee" />
-    <img src="public/images/proownas-hp-screenshot.png" width="auto" height="300" alt="Cover Image" />
- </div>
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-- Proposals by ID page: This is a page where you can view more information about a proposal, activate and end the voting period and also vote on proposals. If the proposal is approved, you can also initiate the asset minting from here.
+This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-    <img src="public/images/proownas-pbyid-screnshot.png" width="auto" height="300" alt="Cover Image" />
+## Learn More
 
-- Assets page: View a list of all assets that have been on-chain on this page. DAO members can also use this page too add default assets to the contract
+To learn more about Next.js, take a look at the following resources:
 
-    <img src="public/images/proownas-prp-screenshot.png" width="auto" height="300" alt="Cover Image" />
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Deployment
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-The frontend is currently hosted on Vercel, you can copy the link or (visit from here)[https://proownas-frontend.vercel.app/]. There is also a Demo video that is deployed on my Youtube, _be sure to subscribe_. Here is the link to the video, (Proownas Pitchdeck)[https://youtu.be/t8FFb16q5pE]
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
